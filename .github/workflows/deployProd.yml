@@ -10,28 +10,35 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2  # Checkout the code from your repository
 
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '7.0'  # Specify your .NET version here
+
     - name: Install dependencies and build
       run: |
-        # Commands to install dependencies and build your ASP.NET Core Web API
         dotnet restore  # Restore dependencies
         dotnet build --configuration Release  # Build the project in Release mode
         dotnet publish -c Release -o publish  # Publish the project to the 'publish' folder
 
-    - name: Deploy to Production
+    - name: Transfer files to production
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        port: 22
+        source: "publish/*"
+        target: "/var/www/myapi/"
+
+    - name: Restart application
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.EC2_HOST }}  # Hostname or IP address of your EC2 instance
-        username: ${{ secrets.EC2_USERNAME }}  # SSH username
-        key: ${{ secrets.EC2_PRIVATE_KEY }}  # SSH private key
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        port: 22
         script: |
-          # Stop the existing service
           sudo systemctl stop my-api.service
-          
-          # Securely copy the latest build to the server
-          scp -r ./publish/* ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/var/www/myapi
-
-          # Change permissions if necessary
           sudo chown -R www-data:www-data /var/www/myapi
-
-          # Restart the service
           sudo systemctl start my-api.service
