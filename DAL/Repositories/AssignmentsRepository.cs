@@ -38,7 +38,6 @@ namespace DAL.Repositories
 
         public async Task<List<Assignment>> GetAssignmentsAsync(string id, string role)
         {
-            
             if (role.Equals("manager"))
             {
                 var assignments = await _context.Assignments
