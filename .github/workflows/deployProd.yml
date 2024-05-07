@@ -1,8 +1,6 @@
 name: deployProd
 on:
-  push:
-    branches:
-      - main  # Trigger the workflow on pushes to the main branch
+  workflow_dispatch:
 
 jobs:
   deploy:
