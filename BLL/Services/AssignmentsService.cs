@@ -67,7 +67,7 @@ namespace BLL.Services
             return newAs;
         }
         public async Task<AssignmentVm> UpdateAssignmentAsync(int id, CreateAssignmentVm assignment)
-        {
+        { 
             var entity = _mapper.Map<Assignment>(assignment);
             var updatedAs = await _assignmentsRepository.UpdateAssignmentAsync(id, entity);
             return _mapper.Map<AssignmentVm>(updatedAs);

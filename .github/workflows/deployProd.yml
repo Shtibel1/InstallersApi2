@@ -1,0 +1,30 @@
+name: deployProd
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow on pushes to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # Use ubuntu-latest as the operating system
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2  # Checkout the code from your repository
+
+    - name: Install dependencies and build
+      run: |
+        # Commands to install dependencies and build your ASP.NET Core Web API
+        dotnet restore  # Restore dependencies
+        dotnet build --configuration Release  # Build the project in Release mode
+
+    - name: deployProd
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}  # Hostname or IP address of your EC2 instance
+        username: ${{ secrets.EC2_USERNAME }}  # SSH username
+        key: ${{ secrets.EC2_PRIVATE_KEY }}  # SSH private key
+        script: |
+          # Commands to deploy your application to the EC2 instance
+          # Example: scp -i /path/to/private_key -r ./publish/* username@hostname:/path/to/deploy/folder
+          # Example: ssh -i /path/to/private_key username@hostname "sudo systemctl restart your-service"
