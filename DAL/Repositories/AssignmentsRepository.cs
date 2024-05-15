@@ -62,7 +62,7 @@ namespace DAL.Repositories
                     .Include(a => a.Product)
                     .Include(a => a.Customer)
                     .Include(a => a.Comments)
-                    .Where(a => a.InstallerId == a.InstallerId)
+                    .Where(a => a.InstallerId == new Guid(id))
                     .ToListAsync();
                 return assignments;
             }

@@ -26,24 +26,32 @@ namespace InstallersApi2.Controllers
             _assignmentService = assignmentService;
         }
         [HttpGet]
-        [Authorize]
         public async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignments()
         {
-            
+            return await GetAssignmentsInternal(User.FindFirstValue(ClaimTypes.NameIdentifier), User.FindFirstValue(ClaimTypes.Role));
+        }
+
+        [HttpGet("{id:guid}")]
+        public async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignmentsByInstaller(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest("Invalid installer ID");
+            }
+
+            return await GetAssignmentsInternal(id, User.FindFirstValue(ClaimTypes.Role));
+        }
+
+        private async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignmentsInternal(string userId, string role)
+        {
             try
             {
-                string jwt = Request.Headers["Authorization"];
-                string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                string role = User.FindFirstValue(ClaimTypes.Role);
-                var assignmentsDto = await _assignmentService.GetAssignmentsAsync(id, role);
-
-
+                var assignmentsDto = await _assignmentService.GetAssignmentsAsync(userId, role);
                 return Ok(assignmentsDto);
-
             }
             catch (Exception ex)
             {
-
+                // Consider logging the exception details here
                 return BadRequest("FAILED_GET_ASSIGNMENTS");
             }
         }
@@ -86,16 +94,11 @@ namespace InstallersApi2.Controllers
         }
 
         [HttpPatch("{id}")]
+        [Authorize]
         public async Task<IActionResult> PatchAssignment(int id, [FromBody] JsonPatchDocument assignment)
         {
             try
             {
-                //if the user is an installer and the assignment is not a status update
-                if (User.IsInRole(Roles.Installer) && !(assignment.Operations != null && assignment.Operations.Count == 1 && assignment.Operations[0].path.Equals("/status")))
-                {
-                    return StatusCode(StatusCodes.Status403Forbidden);
-                }
-
                 await _assignmentService.PatchAssignmentAsync(id, assignment);
 
                 return NoContent();

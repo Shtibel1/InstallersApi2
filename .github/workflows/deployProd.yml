@@ -34,9 +34,9 @@ jobs:
     - name: Restart application
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.EC2_HOST }}
+        host: ${{ secrets.EC2_INSTALLERS_HOST }}
         username: ${{ secrets.EC2_USERNAME }}
-        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        key: ${{ secrets.EC2_INSTALLERS_PRIVATE_KEY }}
         port: 22
         script: |
           sudo systemctl stop my-api.service

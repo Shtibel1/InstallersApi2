@@ -130,7 +130,7 @@ namespace BLL.Services.AuthService
             if (!result.Succeeded) throw new Exception("problem to create a user " +  JsonSerializer.Serialize( result.Errors));
 
             var createdUser = await _userManager.FindByNameAsync(signUp.Name);
-            if (createdUser == null) throw new Exception("Cannot find the user after saving it");
+            if (createdUser == null) throw new Exception("Cannot find the user after saving it"); // LOL what??
 
             await _userManager.AddToRoleAsync(createdUser, signUp.Role);
 

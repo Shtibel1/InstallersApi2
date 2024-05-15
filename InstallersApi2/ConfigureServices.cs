@@ -51,7 +51,7 @@ namespace InstallersApi
                 options.Password.RequireLowercase = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
-                options.User.AllowedUserNameCharacters = "אבגדהוזחטיכלמנסעפצקרשת";
+                options.User.AllowedUserNameCharacters = "אבגדהוזחטיכלמנסעפצקרשתךםןףץabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ ";
             })
                 .AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
 
