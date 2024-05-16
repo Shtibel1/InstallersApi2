@@ -41,4 +41,4 @@ jobs:
         script: |
           sudo systemctl stop installer-api.service
           sudo chown -R ec2-user /home/ec2-user/publish/
-          sudo systemctl start installers-api.service
+          sudo systemctl start installer-api.service
