@@ -40,5 +40,5 @@ jobs:
         port: 22
         script: |
           sudo systemctl stop installer-api.service
-          sudo chown -R www-data:www-data /home/ec2-user/publish/
+          sudo chown -R ec2-user /home/ec2-user/publish/
           sudo systemctl start installers-api.service
