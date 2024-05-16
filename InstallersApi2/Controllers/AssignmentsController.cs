@@ -31,7 +31,7 @@ namespace InstallersApi2.Controllers
             return await GetAssignmentsInternal(User.FindFirstValue(ClaimTypes.NameIdentifier), User.FindFirstValue(ClaimTypes.Role));
         }
 
-        [HttpGet("{id:guid}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignmentsByInstaller(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
