@@ -35,10 +35,10 @@ jobs:
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.EC2_INSTALLERS_HOST }}
-        username: ${{ secrets.EC2_USERNAME }}
+        username: ${{ secrets.EC2_INSTALLERS_USERNAME }}
         key: ${{ secrets.EC2_INSTALLERS_PRIVATE_KEY }}
         port: 22
         script: |
-          sudo systemctl stop installers-api.service
+          sudo systemctl stop installer-api.service
           sudo chown -R www-data:www-data /home/ec2-user/publish/
           sudo systemctl start installers-api.service
