@@ -11,12 +11,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using BLL.Services;
+using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace InstallersApi2.Controllers
 {
     
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AssignmentsController : ControllerBase
     {
         private readonly IAssignmentsService _assignmentService;
@@ -31,15 +34,18 @@ namespace InstallersApi2.Controllers
             return await GetAssignmentsInternal(User.FindFirstValue(ClaimTypes.NameIdentifier), User.FindFirstValue(ClaimTypes.Role));
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignmentsByInstaller(string id)
-        {
-            if (string.IsNullOrWhiteSpace(id))
+        [HttpPost("filter")]
+        
+        public async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignmentsByInstaller(filtersVm filters)
+        {   
+            if (string.IsNullOrWhiteSpace(filters.InstallerId))
             {
                 return BadRequest("Invalid installer ID");
             }
 
-            return await GetAssignmentsInternal(id, User.FindFirstValue(ClaimTypes.Role));
+            var user = User.FindAll(ClaimTypes.NameIdentifier);
+
+            return await GetAssignmentsInternal(filters.InstallerId, User.FindFirstValue(ClaimTypes.Role));
         }
 
         private async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignmentsInternal(string userId, string role)
@@ -144,4 +150,11 @@ namespace InstallersApi2.Controllers
 
 
     }
+
+    public class filtersVm
+    {
+        [JsonProperty("installerId")]
+        public string InstallerId { get; set; }
+    }
+
 }
