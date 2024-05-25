@@ -9,9 +9,11 @@ namespace DAL.Repositories
     public interface ICategoriesRepository
     {
         Task<List<Category>> GetCategoriesAsync();
-        Task<Category> GetCategoryAsync(int id);
+        Task<Category> GetCategoryAsync(Guid id);
         Task<Category> CreateCategoryAsync(Category category);
-        Task<Category> UpdateCategoryAsync(int id, Category category);
-        Task DeleteCategoryAsync(int id);
+        Task<Category> UpdateCategoryAsync(Guid id, Category category);
+        Task DeleteCategoryAsync(Guid id);
+
+        Task AddCategoriesToServiceProviderAsync(Guid serviceProviderId, List<Guid> categoryIds);
     }
 }

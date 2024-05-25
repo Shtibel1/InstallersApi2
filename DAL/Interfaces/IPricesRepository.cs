@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace DAL.Repositories
 {
-    public interface IInstallerPricingRepository 
+    public interface IServiceProviderPricingRepository 
     {
-        Task<List<InstallerPricing>> GetInstallerPricingByInstallerAsync(Guid installerId);
-        Task<InstallerPricing> UpdateInstallerPricingAsync(Guid installerId, InstallerPricing InstallerPricing);
+        Task<List<ServiceProviderPricing>> GetInstallerPricingByInstallerAsync(Guid installerId);
+        Task<ServiceProviderPricing> UpdateInstallerPricingAsync(Guid installerId, ServiceProviderPricing InstallerPricing);
         /*Task<InstallerPricing> CreateInstallerPricingAsync(InstallerPricing InstallerPricing);*/
         Task DeleteInstallerPricingAsync(Guid installerId);
 
-        Task<InstallerPricing> GetInstallerPicing(Guid installerId, int productId);
+        Task<ServiceProviderPricing> GetServiceProviderPicing(Guid installerId, Guid productId);
     }
 }

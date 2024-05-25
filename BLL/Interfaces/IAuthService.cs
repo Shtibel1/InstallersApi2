@@ -13,7 +13,7 @@ namespace Business
     {
 
         Task<SignupServiceResponse?> SignupAsync(SignupModel signUp);
-        Task<AppUserModel?> LoginAsync(LoginModel login);
+        Task<AppUserVm?> LoginAsync(LoginModel login);
         Task<bool> DeleteAsync(string Id);
     }
 }

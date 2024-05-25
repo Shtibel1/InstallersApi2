@@ -17,6 +17,8 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using DAL.Providers;
+using DAL.Repositories.Assignments;
 
 namespace InstallersApi
 {
@@ -29,22 +31,19 @@ namespace InstallersApi
             {
                 mc.AddProfile(new MappingProfile());
             });
+
             IMapper mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
 
-            
 
-            services.AddDbContext<DataContext>(options =>
-            {
-                options.UseSqlServer(configuration.GetConnectionString("Default"));
-            });
+            services.AddDbContext<CentralDbContext>(options =>
+            options.UseSqlServer(configuration.GetConnectionString("Default")));
 
-
-
-           
             services.AddHttpClient();
 
-            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+
+
+            services.AddIdentity<AppUser, AppRole>(options =>
             {
                 options.Password.RequireDigit = false;
                 options.Password.RequiredLength = 1;
@@ -53,24 +52,44 @@ namespace InstallersApi
                 options.Password.RequireUppercase = false;
                 options.User.AllowedUserNameCharacters = "אבגדהוזחטיכלמנסעפצקרשתךםןףץabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ ";
             })
-                .AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
+                .AddEntityFrameworkStores<CentralDbContext>()
+                .AddDefaultTokenProviders();
 
-            services.AddScoped<IManagersRepository, ManagersRepository>();
-            services.AddScoped<IInstallersRepository, InstallersRepository>();
+            services.AddScoped<IEmployeesRepository, ManagersRepository>();
+            services.AddScoped<IServiceProviderRepository, ServiceProviderRepository>();
             services.AddScoped<IAssignmentsRepository, AssignmentsRepository>();
             services.AddScoped<ICategoriesRepository, CategoriesRepository>();
-            services.AddScoped<IInstallerPricingRepository, InstallerPricingRepository>();
+            services.AddScoped<IServiceProviderPricingRepository, ServiceProviderPricingRepository>();
             services.AddScoped<IProductsRepository, ProductsRepository>();
 
             services.AddScoped<IManagersService, ManagersService>();
-            services.AddScoped<IInstallersService, InstallersService>();
+            services.AddScoped<IServiceProvidersService, ServiceProvidersService>();
             services.AddScoped<IAssignmentsService, AssignmentsService>();
             services.AddScoped<ICategoriesService, CategoriesService>();
-            services.AddScoped<IInstallerPricingService, InstallerPricingService>();
+            services.AddScoped<IServiceProviderPricingService, ServiceProviderPricingService>();
             services.AddScoped<IProductsService, ProductsService>();
             services.AddScoped<IAuthService, AuthService>();
 
+            services.AddSingleton<WebSocketService>();
 
+            services.AddScoped<ICompanyDataProvider, CompanyDataProvider>();
+
+
+            
+            /*services.AddScoped(provider =>
+            {
+                return new CompanyDbContext("Data Source=DESKTOP-9C5JK3S\\SQLEXPRESS;Initial Catalog=Shtibay;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
+            });*/
+
+
+/*            services.AddScoped(provider =>
+            {
+                var connectionStringProvider = provider.GetRequiredService<ICompanyDataProvider>();
+                var connectionStrings = connectionStringProvider.GetConnectionStrings();
+
+
+                return new CompanyDbContext(connectionString, connectionStringProvider);
+            });*/
 
         }
     }

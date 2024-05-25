@@ -2,7 +2,9 @@
 using BLL.Interfaces;
 using BLL.Models;
 using DAL.Entities;
+using DAL.Enums;
 using DAL.Repositories;
+using DAL.Repositories.Assignments;
 using Microsoft.AspNetCore.JsonPatch;
 using Newtonsoft.Json;
 using System;
@@ -26,9 +28,9 @@ namespace BLL.Services
             _assignmentsRepository = assignmentsRepository;
             _mapper = mapper;
         }
-        public async Task<AssignmentVm> GetAssignmentAsync(int id)
+        public async Task<AssignmentVm> GetAssignmentAsync(Guid id, CompanyNames companyNames)
         {
-            var assigment = await _assignmentsRepository.GetAssignmentAsync(id);
+            var assigment = await _assignmentsRepository.GetAssignmentAsync(id, companyNames);
             var assignmentVm = _mapper.Map<AssignmentVm>(assigment);
 
             //var product = await _productsService.GetProductsByCategoryId(assigment.Product.CategoryId);
@@ -37,9 +39,9 @@ namespace BLL.Services
             return assignmentVm;
         }
 
-        public async Task<List<AssignmentVm>> GetAssignmentsAsync(string id, string role)
+        public async Task<List<AssignmentVm>> GetAssignmentsAsync(string id, string role, AssignmentsFilters? filters)
         {
-            var assignments = _mapper.Map<List<AssignmentVm>>(await _assignmentsRepository.GetAssignmentsAsync(id, role));
+            var assignments = _mapper.Map<List<AssignmentVm>>(await _assignmentsRepository.GetAssignmentsAsync(filters));
             return assignments;
         }
 
@@ -54,7 +56,7 @@ namespace BLL.Services
                 {
                     new Comment
                     {
-                        Id = 0,
+                        Id = Guid.NewGuid(),
                         Content = assignment.Comments[0].Content,
                         WorkerId = assignment.ManagerId,
                     }
@@ -66,21 +68,21 @@ namespace BLL.Services
             var newAs = _mapper.Map<AssignmentVm>(createdAssignment);
             return newAs;
         }
-        public async Task<AssignmentVm> UpdateAssignmentAsync(int id, CreateAssignmentVm assignment)
+        public async Task<AssignmentVm> UpdateAssignmentAsync(Guid id, CreateAssignmentVm assignment)
         { 
             var entity = _mapper.Map<Assignment>(assignment);
             var updatedAs = await _assignmentsRepository.UpdateAssignmentAsync(id, entity);
             return _mapper.Map<AssignmentVm>(updatedAs);
         }
 
-        public async Task PatchAssignmentAsync(int id, JsonPatchDocument assignment)
+        public async Task PatchAssignmentAsync(Guid id, JsonPatchDocument assignment, CompanyNames companyName)
         {
-            await _assignmentsRepository.PatchAssignmentAsync(id, assignment);
+            await _assignmentsRepository.PatchAssignmentAsync(id, assignment, companyName);
         }
 
-        public async Task DeleteAssignmentAsync(int id)
+        public async Task DeleteAssignmentAsync(Guid id, CompanyNames companyName)
         {
-             await _assignmentsRepository.DeleteAssignmentAsync(id);
+             await _assignmentsRepository.DeleteAssignmentAsync(id, companyName);
         }
 
     }

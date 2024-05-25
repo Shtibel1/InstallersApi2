@@ -7,10 +7,10 @@ namespace DAL.Entities
 {
     public class Comment
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
-        public string Content { get; set; }
         public Guid WorkerId { get; set; }
-        public int AssignmentId { get; set; }
+        public Guid AssignmentId { get; set; }
+        public string Content { get; set; }
     }
 }

@@ -9,10 +9,10 @@ namespace BLL.Interfaces
 {
     public interface ICategoriesService
     {
-        Task<List<CategoryDto>> GetCategoriesAsync();
-        Task<CategoryDto> GetCategoryAsync(int id);
-        Task<CategoryDto> CreateCategoryAsync(Category category);
-        Task<CategoryDto> UpdateCategoryAsync(int id, Category category);
-        Task DeleteCategoryAsync(int id);
+        Task<List<CategoryVm>> GetCategoriesAsync();
+        Task<CategoryVm> GetCategoryAsync(Guid id);
+        Task<CategoryVm> CreateCategoryAsync(Category category);
+        Task<CategoryVm> UpdateCategoryAsync(Guid id, Category category);
+        Task DeleteCategoryAsync(Guid id);
     }
 }

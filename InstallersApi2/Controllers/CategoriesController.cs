@@ -29,20 +29,20 @@ namespace InstallersApi2.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Category>> GetCategory(int id)
+        public async Task<ActionResult<Category>> GetCategory(Guid id)
         {
             return Ok(await _categoriesService.GetCategoryAsync(id));
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = Roles.Manager)]
-        public async Task<IActionResult> PutCategory(int id, Category category)
+        [Authorize(Roles = nameof(Role.Employee))]
+        public async Task<IActionResult> PutCategory(Guid id, Category category)
         {
             return Ok(await _categoriesService.UpdateCategoryAsync(id, category));
         }
 
         [HttpPost]
-        [Authorize(Roles = Roles.Manager)]
+        [Authorize(Roles = nameof(Role.Employee))]
         public async Task<ActionResult<Category>> PostCategory(Category category)
         {
 
@@ -53,8 +53,8 @@ namespace InstallersApi2.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = Roles.Manager)]
-        public async Task<IActionResult> DeleteCategory(int id)
+        [Authorize(Roles = nameof(Role.Employee))]
+        public async Task<IActionResult> DeleteCategory(Guid id)
         {
             await _categoriesService.DeleteCategoryAsync(id);
             return NoContent();

@@ -13,10 +13,10 @@ namespace BLL.Services
 {
     public class ManagersService : IManagersService
     {
-        private readonly IManagersRepository _managersRepository;
+        private readonly IEmployeesRepository _managersRepository;
         private readonly IMapper _mapper;
 
-        public ManagersService(IManagersRepository managersRepository, IMapper mapper)
+        public ManagersService(IEmployeesRepository managersRepository, IMapper mapper)
         {
             _managersRepository = managersRepository;
             _mapper = mapper;
@@ -32,9 +32,9 @@ namespace BLL.Services
                 Role = manager.Role
             };*/
 
-            var entity = _mapper.Map<Manager>(manager);
+            var entity = _mapper.Map<Employee>(manager);
             
-            var newManEntity = await _managersRepository.CreateManagerAsync(entity);
+            var newManEntity = await _managersRepository.CreateEmployeeAsync(entity);
             var newMan = _mapper.Map<ManagerVm>(newManEntity);
             return newMan;
         }

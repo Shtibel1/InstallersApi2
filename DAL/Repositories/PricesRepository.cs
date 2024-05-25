@@ -1,5 +1,6 @@
 ﻿using DAL.Data;
 using DAL.Entities;
+using DAL.Providers;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,61 +9,56 @@ using System.Threading.Tasks;
 
 namespace DAL.Repositories
 {
-    public class InstallerPricingRepository : IInstallerPricingRepository
+    public class ServiceProviderPricingRepository : IServiceProviderPricingRepository
     {
-        private readonly DataContext _context;
+        private readonly ICompanyDataProvider _companyDataProvider;
 
-        public InstallerPricingRepository(DataContext context)
+        public ServiceProviderPricingRepository(ICompanyDataProvider companyDataProvider)
         {
-            _context = context;
+            _companyDataProvider = companyDataProvider;
+
         }
 
 
-        public async Task<List<InstallerPricing>> GetInstallerPricingByInstallerAsync(Guid installerId)
+        public async Task<List<ServiceProviderPricing>> GetInstallerPricingByInstallerAsync(Guid installerId)
         {
-            return await _context.InstallerPricing
+            var context = _companyDataProvider.GetContexts()[0];
+            return await context.ServiceProviderPricing
                 .Where(p => p.InstallerId == installerId)
                 .ToListAsync();
         }
 
-        public async Task<InstallerPricing> UpdateInstallerPricingAsync(Guid installerId, InstallerPricing InstallerPricing)
+        public async Task<ServiceProviderPricing> UpdateInstallerPricingAsync(Guid installerId, ServiceProviderPricing InstallerPricing)
         {
+            var context = _companyDataProvider.GetContexts()[0];
             InstallerPricing.InstallerId = installerId;
-            var updatedPrice = await _context.InstallerPricing.AddAsync(InstallerPricing);
-            await _context.SaveChangesAsync();
+            var updatedPrice = await context.ServiceProviderPricing.AddAsync(InstallerPricing);
+            await context.SaveChangesAsync();
             return updatedPrice.Entity;
         }
 
         public async Task DeleteInstallerPricingAsync(Guid installerId)
         {
-            var installerInstallerPricing = await _context.InstallerPricing.Where(p => p.InstallerId == installerId).ToListAsync();
+            var context = _companyDataProvider.GetContexts()[0];
+            var installerInstallerPricing = await context.ServiceProviderPricing.Where(p => p.InstallerId == installerId).ToListAsync();
             if (installerInstallerPricing != null)
             {
                 for (int i = 0; i < installerInstallerPricing.Count; i++)
                 {
-                    _context.Remove(installerInstallerPricing[i]);
+                    context.Remove(installerInstallerPricing[i]);
                 }
             
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
 
             }
         }
 
 
-        public async Task<InstallerPricing> GetInstallerPicing(Guid installerId, int productId)
+        public async Task<ServiceProviderPricing> GetServiceProviderPicing(Guid installerId, Guid productId)
         {
-            return await _context.InstallerPricing.FirstOrDefaultAsync(i => i.ProductId == productId && i.InstallerId == installerId);
+            var context = _companyDataProvider.GetContexts()[0];
+            return await context.ServiceProviderPricing.FirstOrDefaultAsync(i => i.ProductId == productId && i.InstallerId == installerId);
         }
-
-
-
-        /*public async Task<InstallerPricing> CreateInstallerPricingAsync(InstallerPricing InstallerPricing)
-        {
-            var newInstallerPricing = await _context.AddAsync(InstallerPricing).ConfigureAwait(false);
-            await _context.SaveChangesAsync();
-            return newInstallerPricing.Entity;
-        }*/
-
 
     }
 }

@@ -1,54 +1,54 @@
 ﻿using AutoMapper;
-using BLL.DTOs.Abstracts;
-using BLL.Exceptions;
-using BLL.Models;
+using BLL.DTOs;
 using Business;
 using Business.Models;
+using DAL.Abstracts;
 using DAL.Entities;
 using DAL.Enums;
 using DAL.Interfaces;
+using DAL.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Data;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace BLL.Services.AuthService
 {
     public class AuthService : IAuthService
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _loginManager;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly RoleManager<AppRole> _roleManager;
+        private readonly SignInManager<AppUser> _loginManager;
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
-        private readonly IManagersRepository _managersRepository;
-        private readonly IInstallersRepository _installersRepository;
-        private HttpClient client = new HttpClient();
+        private readonly IEmployeesRepository _employeesRepository;
+        private readonly IServiceProviderRepository _serviceProvidersRepository;
+        private readonly ICategoriesRepository _categoriesRepository;
+
         public AuthService(
-           UserManager<ApplicationUser> userManager,
-           SignInManager<ApplicationUser> loginManager,
+           UserManager<AppUser> userManager,
+           RoleManager<AppRole> roleManager,
+           SignInManager<AppUser> loginManager,
            IConfiguration configuration,
            IMapper mapper,
-           IManagersRepository managersRepository,
-           IInstallersRepository installersRepository)
+           IEmployeesRepository employeesRepository,
+           IServiceProviderRepository serviceProvidersRepository,
+           ICategoriesRepository categoriesRepository)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
             _loginManager = loginManager;
             _configuration = configuration;
             _mapper = mapper;
-            _managersRepository = managersRepository;
-            _installersRepository = installersRepository;
+            _employeesRepository = employeesRepository;
+            _serviceProvidersRepository = serviceProvidersRepository;
+            _categoriesRepository = categoriesRepository;
         }
 
-        public async Task<AppUserModel?> LoginAsync(LoginModel login)
+        public async Task<AppUserVm?> LoginAsync(LoginModel login)
         {
             var user = await _userManager.FindByNameAsync(login.UserName);
             if (user == null) return null;
@@ -57,105 +57,127 @@ namespace BLL.Services.AuthService
             if (!signInResult.Succeeded) return null;
 
             var roles = await _userManager.GetRolesAsync(user);
+            if (roles.Count == 0) return null;
 
-            Guid workerId;
-            if (roles[0] == Roles.Manager)
-            {
-               var worker = await this._managersRepository.GetManagerbyUserId(user.Id);
-                workerId = worker.Id;
-            }
-            else
-            {
-                var worker = await _installersRepository.GetInstallerbyUserId(user.Id);
-                workerId = worker.Id;
-            }
-            var token = generateToken(user, roles[0]);
 
-            return new AppUserModel { Id = workerId, Name = user.UserName, Token = token, Role = roles[0] };
+            var role = Enum.Parse<Role>(roles[0]);
+
+            Guid userId;
+            var token = string.Empty;
+            var companiesVm = new List<CompanyVm>();
+
+            switch (role)
+            {
+                case Role.Employee:
+                case Role.Storekeeper:
+                    var employee = await _employeesRepository.GetEmployeeByUserId(user.Id);
+                    userId = employee.Id;
+                    companiesVm = employee.Companies.Select(c => _mapper.Map<CompanyVm>(c)).ToList();
+                    token = GenerateToken(user, role, employee.Companies.Select(c => c.Name).ToList());
+                    break;
+                case Role.ServiceProvider:
+                    var serviceProvider = await _serviceProvidersRepository.GetserviceProviderbyUserId(user.Id);
+                    userId = serviceProvider.Id;
+                    companiesVm = serviceProvider.Companies.Select(c => _mapper.Map<CompanyVm>(c)).ToList();
+                    token = GenerateToken(user, role, serviceProvider.Companies.Select(s => s.Name).ToList());
+                    break;
+                default:
+                    return null;
+            }
+
+
+
+
+            return new AppUserVm { Id = userId, Name = user.UserName, Token = token, Role = roles[0], Companies = companiesVm };
         }
 
         public async Task<SignupServiceResponse?> SignupAsync(SignupModel signUp)
         {
             var user = await _userManager.FindByNameAsync(signUp.Name);
-            if (user is not null) return new SignupServiceResponse { UserIsAlreadyExist = true };
+            if (user != null) return new SignupServiceResponse { UserIsAlreadyExist = true };
+
             var savedUser = await SaveUser(signUp, signUp.Role);
-            var savedWorker = await SaveWorkerAsync(signUp, savedUser.Id);
+            var savedServiceProvider = await SaveRoleSpecificDataAsync(signUp, savedUser.Id);
+
             return new SignupServiceResponse { UserIsAlreadyExist = false };
         }
 
-        private async Task<Worker> SaveWorkerAsync(SignupModel signUp, string identityId)
+        private async Task<object> SaveRoleSpecificDataAsync(SignupModel signUp, Guid identityId)
         {
-            var worker = new Worker();
             switch (signUp.Role)
             {
-                case "manager":
-                    var managerEntity = _mapper.Map<Manager>(signUp);
+                case Role.Employee:
+                case Role.Storekeeper:
+                    var managerEntity = _mapper.Map<Employee>(signUp);
                     managerEntity.IdentityId = identityId;
-                    worker = await _managersRepository.CreateManagerAsync(managerEntity);
-                    break;
+                    return await _employeesRepository.CreateEmployeeAsync(managerEntity);
+
+                case Role.ServiceProvider:
+                    var serviceProviderEntity = _mapper.Map<ServiceProvider>(signUp);
+                    serviceProviderEntity.IdentityId = identityId;
+                    var createdServiceProvider = await _serviceProvidersRepository.CreateserviceProviderAsync(serviceProviderEntity);
+                    await _categoriesRepository.AddCategoriesToServiceProviderAsync(createdServiceProvider.Id, signUp.Categories);
+                    return createdServiceProvider;
+
+                default:
                     
-                case "installer":
-
-                    var installerEntity = _mapper.Map<Installer>(signUp);
-                    installerEntity.IdentityId = identityId;
-                    worker = await _installersRepository.CreateInstallerAsync(installerEntity, signUp.Categories);
-                    break;
-                default: throw new Exception("cannot find role in signupModel");
+                    throw new Exception("Role not found in SignupModel");
             }
-
-            return worker;
         }
 
         public async Task<bool> DeleteAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id).ConfigureAwait(false);
-            if (user == null)
-            {
-                return false;
-            }
+            if (user == null) return false;
+
             var result = await _userManager.DeleteAsync(user);
-            if (!result.Succeeded)
-            {
-                return false;
-            }
-            return true;
+            return result.Succeeded;
         }
 
-
-        private async Task<ApplicationUser> SaveUser(SignupModel signUp, string role)
+        private async Task<AppUser> SaveUser(SignupModel signUp, Role role)
         {
-            var user = _mapper.Map<ApplicationUser>(signUp);
-
+            var user = _mapper.Map<AppUser>(signUp);
             var result = await _userManager.CreateAsync(user, signUp.Password);
-            if (!result.Succeeded) throw new Exception("problem to create a user " +  JsonSerializer.Serialize( result.Errors));
+            if (!result.Succeeded)
+            {
+                throw new Exception("Problem creating user: " + JsonSerializer.Serialize(result.Errors));
+            }
 
             var createdUser = await _userManager.FindByNameAsync(signUp.Name);
-            if (createdUser == null) throw new Exception("Cannot find the user after saving it"); // LOL what??
+            if (createdUser == null)
+            {
+                throw new Exception("Cannot find the user after saving it");
+            }
 
-            await _userManager.AddToRoleAsync(createdUser, signUp.Role);
-
+            await _userManager.AddToRoleAsync(createdUser, role.ToString());
             return createdUser;
         }
 
-
-        private string generateToken(ApplicationUser user, string role)
+        private string GenerateToken(AppUser user, Role role ,List<string>? companyNames)
         {
             var authClaims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Role, role),
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Role, role.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(CustomClaimTypes.Companies, JsonSerializer.Serialize(companyNames)),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
+            var token = SetTokenConfig(authClaims);
+            return token;
+        }
+
+        private string SetTokenConfig(List<Claim> authClaims)
+        {
             var authSigninKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]));
             var token = new JwtSecurityToken(
                 issuer: _configuration["JWT:ValidIssuer"],
                 audience: _configuration["JWT:ValidAudiences"],
-                expires: DateTime.Now.AddDays(30),
+                expires: DateTime.Now.AddDays(int.Parse(_configuration["JWT:TokenExpirationDays"])),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigninKey, SecurityAlgorithms.HmacSha256Signature)
-                );
+            );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

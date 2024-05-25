@@ -1,4 +1,5 @@
 ﻿using BLL.Validations;
+using DAL.Enums;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -24,9 +25,9 @@ namespace BLL.Services.AuthService
         public string? Email { get; set; }
         [JsonProperty("role")]
         [Required(ErrorMessage = "Role is required")]
-        public string Role { get; set; }
+        public Role Role { get; set; }
         [JsonProperty("categories")]
-        [ConditionalRequired("Role", "Installer")]
-        public List<int>? Categories { get; set; }
+        [ConditionalRequired("Role", "ServiceProvider")]
+        public List<Guid>? Categories { get; set; }
     }
 }

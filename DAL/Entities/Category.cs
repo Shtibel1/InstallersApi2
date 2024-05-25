@@ -7,8 +7,8 @@ namespace DAL.Entities
 {
     public class Category
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; }
-        public List<CategoryInstaller> CategoryInstallers { get; set; }
+        public List<ServiceProviderCategory> ServiceProviderCategories { get; set; } = new List<ServiceProviderCategory>();
     }
 }

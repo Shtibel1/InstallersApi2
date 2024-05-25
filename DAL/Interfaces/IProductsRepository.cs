@@ -9,10 +9,10 @@ namespace DAL.Repositories
     public interface IProductsRepository
     {
         Task<List<Product>> GetProductsAsync();
-        Task<Product> GetProductAsync(int id);
-        Task<Product> UpdateProductAsync(int id, Product product);
+        Task<Product?> GetProductAsync(Guid id);
+        Task<Product> UpdateProductAsync(Guid id, Product product);
         Task<Product> CreateProductAsync(Product product);
-        Task DeleteProductAsync(int id);
-        Task<List<Product>> GetProductsByCategoryId(int id);
+        Task DeleteProductAsync(Guid id);
+        Task<List<Product>> GetProductsByCategoryId(Guid id);
     }
 }

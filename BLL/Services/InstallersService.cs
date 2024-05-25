@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using BLL.Interfaces;
 using BLL.Models;
+using DAL.Abstracts;
 using DAL.Entities;
+using DAL.Enums;
 using DAL.Interfaces;
+using DAL.Providers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,60 +14,41 @@ using System.Threading.Tasks;
 
 namespace BLL.Services
 {
-    public class InstallersService : IInstallersService
+    public class ServiceProvidersService : IServiceProvidersService
     {
-        private readonly IInstallersRepository _accountRepository;
+        private readonly IServiceProviderRepository _accountRepository;
         private readonly IMapper _mapper;
+        private readonly ICompanyDataProvider _companyDataProvider;
 
-        public InstallersService(IInstallersRepository accountRepository, IMapper mapper)
+        public ServiceProvidersService(IServiceProviderRepository accountRepository, IMapper mapper, ICompanyDataProvider companyDataProvider)
         {
             _accountRepository = accountRepository;
             _mapper = mapper;
+            _companyDataProvider = companyDataProvider;
         }
 
-        public async Task<InstallerDto> CreateInstallerAsync(CreateInstallerModel installer)
+        public async Task<ServiceProviderVm> CreateServiceProviderAsync(CreateServiceProviderVm ServiceProvider)
         {
-            var entity = _mapper.Map<Installer>(installer);
-            var newIns = _mapper.Map<InstallerDto>(await _accountRepository.CreateInstallerAsync(entity, installer.Categories.ToList()));
+            var entity = _mapper.Map<ServiceProvider>(ServiceProvider);
+            var newIns = _mapper.Map<ServiceProviderVm>(await _accountRepository.CreateserviceProviderAsync(entity));
             return newIns;
         }
 
-        public async Task<List<InstallerDto>> GetInstallersAsync()
+        public async Task<List<ServiceProviderVm>> GetServiceProvidersAsync(List<CompanyNames> companyNames)
         {
-            var entities = await _accountRepository.GetInstallersAsync();
-            var installers = new List<InstallerDto>();
-            var categories = new List<CategoryDto>();
-            for (int i = 0; i < entities.Count; i++)
-            {
-                foreach (var ci in entities[i].CategoryInstallers.ToList())
-                {
-                    categories.Add(new CategoryDto
-                    {
-                        Id = ci.CategoryId,
-                        Name = ci.Category.Name
-                    });
-                }
+             
 
-                installers.Add(new InstallerDto
-                {
-                    Id = entities[i].Id,
-                    Name = entities[i].Name,
-                    Role = entities[i].Role,
-                    Phone = entities[i].Phone,
-                    Categories = categories
-                });
+            var entities = await _accountRepository.GetServiceProvidersByCompaniesAsync(companyNames);
+            
+            var vms = _mapper.Map<List<ServiceProviderVm>>(entities);
 
-                categories = new List<CategoryDto>();
-
-            }
-
-            return installers;
+            return vms;
         }
 
-        public async Task<List<InstallerDto>> GetInstallerAsync(Guid id)
+        public async Task<List<ServiceProviderVm>> GetServiceProviderAsync(Guid id)
         {
-            var entity = await _accountRepository.GetInstallerAsync(id);
-            return _mapper.Map<List<InstallerDto>>(entity);
+            var entity = await _accountRepository.GetserviceProviderAsync(id);
+            return _mapper.Map<List<ServiceProviderVm>>(entity);
         }
     }
 }

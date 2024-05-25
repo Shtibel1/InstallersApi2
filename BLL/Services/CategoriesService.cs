@@ -21,34 +21,34 @@ namespace BLL.Services
             _mapper = mapper;
         }
 
-        public async Task<CategoryDto> CreateCategoryAsync(Category category)
+        public async Task<CategoryVm> CreateCategoryAsync(Category category)
         {
             var newCat = await _categoriesRepository.CreateCategoryAsync(category);
-            return _mapper.Map<CategoryDto>(newCat);
+            return _mapper.Map<CategoryVm>(newCat);
         }
 
-        public async Task DeleteCategoryAsync(int id)
+        public async Task DeleteCategoryAsync(Guid id)
         {
              await _categoriesRepository.DeleteCategoryAsync(id);
         }
 
-        public async Task<List<CategoryDto>> GetCategoriesAsync()
+        public async Task<List<CategoryVm>> GetCategoriesAsync()
         {
             var categories = await _categoriesRepository.GetCategoriesAsync();
-            return _mapper.Map<List<CategoryDto>>(categories);
+            return _mapper.Map<List<CategoryVm>>(categories);
         }
 
-        public async Task<CategoryDto> GetCategoryAsync(int id)
+        public async Task<CategoryVm> GetCategoryAsync(Guid id)
         {
 
             var category = await _categoriesRepository.GetCategoryAsync(id);
-            return _mapper.Map<CategoryDto>(category);
+            return _mapper.Map<CategoryVm>(category);
         }
 
-        public async Task<CategoryDto> UpdateCategoryAsync(int id, Category category)
+        public async Task<CategoryVm> UpdateCategoryAsync(Guid id, Category category)
         {
             var updatedCat = await _categoriesRepository.UpdateCategoryAsync(id, category);
-            return _mapper.Map<CategoryDto>(updatedCat);
+            return _mapper.Map<CategoryVm>(updatedCat);
         }
     }
 }

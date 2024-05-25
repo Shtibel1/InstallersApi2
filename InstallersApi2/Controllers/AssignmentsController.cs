@@ -1,22 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using BLL.Interfaces;
 using BLL.Models;
-using BLL.Interfaces;
-using System.Security.Claims;
 using DAL.Enums;
-using Microsoft.AspNetCore.JsonPatch;
-using System.Net;
+using DAL.Repositories.Assignments;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using BLL.Services;
-using System.Text.Json;
-using Newtonsoft.Json;
+using System.Security.Claims;
 
 namespace InstallersApi2.Controllers
 {
-    
+
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
@@ -29,9 +22,9 @@ namespace InstallersApi2.Controllers
             _assignmentService = assignmentService;
         }
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignments()
+        public async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignments(AssignmentsFilters? filters)
         {
-            return await GetAssignmentsInternal(User.FindFirstValue(ClaimTypes.NameIdentifier), User.FindFirstValue(ClaimTypes.Role));
+            return await GetAssignmentsInternal(User.FindFirstValue(ClaimTypes.NameIdentifier), User.FindFirstValue(ClaimTypes.Role), filters);
         }
 
         [HttpPost("filter")]
@@ -45,14 +38,14 @@ namespace InstallersApi2.Controllers
 
             var user = User.FindAll(ClaimTypes.NameIdentifier);
 
-            return await GetAssignmentsInternal(filters.InstallerId, User.FindFirstValue(ClaimTypes.Role));
+            return await GetAssignmentsInternal(filters.InstallerId, User.FindFirstValue(ClaimTypes.Role), null);
         }
 
-        private async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignmentsInternal(string userId, string role)
+        private async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignmentsInternal(string userId, string role, AssignmentsFilters? filters)
         {
             try
             {
-                var assignmentsDto = await _assignmentService.GetAssignmentsAsync(userId, role);
+                var assignmentsDto = await _assignmentService.GetAssignmentsAsync(userId, role, filters);
                 return Ok(assignmentsDto);
             }
             catch (Exception ex)
@@ -62,12 +55,12 @@ namespace InstallersApi2.Controllers
             }
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<AssignmentVm>> GetAssignment(int id)
+        [HttpGet("{companyName}/{id}")]
+        public async Task<ActionResult<AssignmentVm>> GetAssignment(CompanyNames companyName, Guid id)
         {
             try
             {
-                var assignment = await _assignmentService.GetAssignmentAsync(id);
+                var assignment = await _assignmentService.GetAssignmentAsync(id, companyName);
 
                 if (assignment == null)
                 {
@@ -85,8 +78,8 @@ namespace InstallersApi2.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = Roles.Manager)]
-        public async Task<IActionResult> PutAssignment(int id, CreateAssignmentVm assignment)
+        [Authorize(Roles = nameof(Role.Employee))]
+        public async Task<IActionResult> PutAssignment(Guid id, CreateAssignmentVm assignment)
         {
             try
             {
@@ -99,13 +92,13 @@ namespace InstallersApi2.Controllers
             }
         }
 
-        [HttpPatch("{id}")]
+        [HttpPatch("{companyName}/{id}")]
         [Authorize]
-        public async Task<IActionResult> PatchAssignment(int id, [FromBody] JsonPatchDocument assignment)
+        public async Task<IActionResult> PatchAssignment(CompanyNames companyName, Guid id, [FromBody] JsonPatchDocument assignment)
         {
             try
             {
-                await _assignmentService.PatchAssignmentAsync(id, assignment);
+                await _assignmentService.PatchAssignmentAsync(id, assignment, companyName);
 
                 return NoContent();
             }
@@ -133,13 +126,13 @@ namespace InstallersApi2.Controllers
         }
 
         // DELETE: api/Assignments/5
-        [HttpDelete("{id}")]
-        [Authorize(Roles = Roles.Manager)]
-        public async Task<IActionResult> DeleteAssignment(int id)
+        [HttpDelete("{companyName}/{id}")]
+        [Authorize(Roles = nameof(Role.Employee))]
+        public async Task<IActionResult> DeleteAssignment(CompanyNames companyName, Guid id)
         {
             try
             {
-                await _assignmentService.DeleteAssignmentAsync(id);
+                await _assignmentService.DeleteAssignmentAsync(id, companyName);
                 return NoContent();
             }
             catch (Exception)
@@ -153,8 +146,8 @@ namespace InstallersApi2.Controllers
 
     public class filtersVm
     {
-        [JsonProperty("installerId")]
         public string InstallerId { get; set; }
     }
+
 
 }

@@ -34,15 +34,15 @@ namespace InstallersApi2.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ProductVm>> GetProduct(int id)
+        public async Task<ActionResult<ProductVm>> GetProduct(Guid id)
         {
             return Ok(await _productsService.GetProductAsync(id));
         }
 
 
         [HttpPut("{id}")]
-        [Authorize(Roles = Roles.Manager)]
-        public async Task<IActionResult> PutProduct(int id, ProductVm product)
+        [Authorize(Roles = nameof(Role.Employee))]
+        public async Task<IActionResult> PutProduct(Guid id, ProductVm product)
         {
 
             return Ok(await _productsService.UpdateProductAsync(id, product));
@@ -50,7 +50,7 @@ namespace InstallersApi2.Controllers
 
         
         [HttpPost]
-        [Authorize(Roles = Roles.Manager)]
+        [Authorize(Roles = nameof(Role.Employee))]
         public async Task<ActionResult<ProductVm>> PostProduct(ProductVm product)
         {
             var newProd = await _productsService.CreateProductAsync(product);
@@ -59,8 +59,8 @@ namespace InstallersApi2.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = Roles.Manager)]
-        public async Task<IActionResult> DeleteProduct(int id)
+        [Authorize(Roles = nameof(Role.Employee))]
+        public async Task<IActionResult> DeleteProduct(Guid id)
         {
             await _productsService.DeleteProductAsync(id);
             return NoContent();

@@ -1,12 +1,9 @@
 ﻿using AutoMapper;
+using BLL.DTOs;
 using BLL.Interfaces;
 using BLL.Models;
 using DAL.Entities;
 using DAL.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BLL.Services
 {
@@ -14,9 +11,9 @@ namespace BLL.Services
     {
         private readonly IProductsRepository _productsRepository;
         private readonly IMapper _mapper;
-        private readonly IInstallerPricingRepository _installerPricingRepository;
+        private readonly IServiceProviderPricingRepository _installerPricingRepository;
 
-        public ProductsService(IProductsRepository productsRepository, IMapper mapper, IInstallerPricingRepository installerPricingRepository)
+        public ProductsService(IProductsRepository productsRepository, IMapper mapper, IServiceProviderPricingRepository installerPricingRepository)
         {
             _productsRepository = productsRepository;
             _mapper = mapper;
@@ -30,12 +27,12 @@ namespace BLL.Services
             return vm;
         }
 
-        public async Task DeleteProductAsync(int id)
+        public async Task DeleteProductAsync(Guid id)
         {
             await _productsRepository.DeleteProductAsync(id);
         }
 
-        public async Task<ProductVm> GetProductAsync(int id)
+        public async Task<ProductVm> GetProductAsync(Guid id)
         {
             return _mapper.Map<ProductVm>(await _productsRepository.GetProductAsync(id));
         }
@@ -45,17 +42,17 @@ namespace BLL.Services
             return  _mapper.Map<List<ProductVm>>(await _productsRepository.GetProductsAsync());
         }
 
-        public async Task<ProductVm> UpdateProductAsync(int id, ProductVm product)
+        public async Task<ProductVm> UpdateProductAsync(Guid id, ProductVm product)
         {
             var entity = _mapper.Map<Product>(product);
             return _mapper.Map<ProductVm>(await _productsRepository.UpdateProductAsync(id, entity));
         }
 
-        public async Task<SingleProductVm> GetProductWithPrices(int id, Guid installerId, int productId)
+        public async Task<SingleProductVm> GetProductWithPrices(Guid id, Guid installerId, Guid productId)
         {
             var productVm = await this.GetProductAsync(id);
-            var installerPricing = await _installerPricingRepository.GetInstallerPicing(installerId, productId);
-            var installerPricingVm = _mapper.Map<InstallerPricingVm>(installerPricing);
+            var installerPricing = await _installerPricingRepository.GetServiceProviderPicing(installerId, productId);
+            var installerPricingVm = _mapper.Map<ServiceProviderPricingVm>(installerPricing);
 
             return new SingleProductVm
             {

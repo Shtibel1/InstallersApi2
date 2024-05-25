@@ -1,62 +1,87 @@
-﻿using DAL.Data;
+﻿using DAL.Abstracts;
+using DAL.Data;
 using DAL.Entities;
+using DAL.Providers;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace DAL.Repositories
 {
     public class CategoriesRepository : ICategoriesRepository
     {
-        private readonly DataContext _context;
+        private readonly ICompanyDataProvider _companyDataProvider;
 
-        public CategoriesRepository(DataContext context)
+        public CategoriesRepository(ICompanyDataProvider companyDataProvider)
         {
-            _context = context;
+            _companyDataProvider = companyDataProvider;
+
         }
 
         public async Task<List<Category>> GetCategoriesAsync()
         {
-            return await _context.Categories.ToListAsync();
+            var context = _companyDataProvider.GetContexts()[0];
+            return await context.Categories.ToListAsync();
         }
 
-        public async Task<Category> GetCategoryAsync(int id)
+        public async Task<List<Category>> GetCategoriesByServiceProvidersAsync(IEnumerable<Guid> serviceProviderIds)
         {
-            
-            return  await _context.Categories.FindAsync(id);
+            var context = _companyDataProvider.GetContexts()[0];
+            return await context.ServiceProviderCategories
+                .Where(spc => serviceProviderIds.Contains(spc.ServiceProviderId))
+                .Select(spc => spc.Category)
+                .ToListAsync();
+        }
+
+        public async Task<Category> GetCategoryAsync(Guid id)
+        {
+            var context = _companyDataProvider.GetContexts()[0];
+            return  await context.Categories.FindAsync(id);
         }
         public async Task<Category> CreateCategoryAsync(Category category)
         {
-            var result = await _context.Categories.AddAsync(category).ConfigureAwait(false);
+            var context = _companyDataProvider.GetContexts()[0];
+            var result = await context.Categories.AddAsync(category).ConfigureAwait(false);
             if (result != null && result.Entity != null)
             {
                 var newCat = result.Entity;
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
                 return newCat;
             }
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             return null;
         }
-        public async Task<Category> UpdateCategoryAsync(int id, Category category)
+        public async Task<Category> UpdateCategoryAsync(Guid id, Category category)
         {
-            var result = _context.Categories.Update(category);
+            var context = _companyDataProvider.GetContexts()[0];
+            var result = context.Categories.Update(category);
             if (result != null && result.Entity != null)
             {
                 var updatedCat = result.Entity;
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
                 return updatedCat;
             }
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             return null;
         }
 
-        public async Task DeleteCategoryAsync(int id)
+        public async Task DeleteCategoryAsync(Guid id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
+            var context = _companyDataProvider.GetContexts()[0];
+            var category = await context.Categories.FindAsync(id);
+            context.Categories.Remove(category);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task AddCategoriesToServiceProviderAsync(Guid serviceProviderId, List<Guid> categoryIds)
+        {
+            var context = _companyDataProvider.GetContexts()[0];
+            var serviceProviderCategories = categoryIds.Select(categoryId => new ServiceProviderCategory
+            {
+                ServiceProviderId = serviceProviderId,
+                CategoryId = categoryId
+            });
+
+            await context.ServiceProviderCategories.AddRangeAsync(serviceProviderCategories);
+            await context.SaveChangesAsync();
         }
 
 

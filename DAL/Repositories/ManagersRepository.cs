@@ -1,5 +1,6 @@
 ﻿using DAL.Data;
 using DAL.Entities;
+using DAL.Enums;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,19 +11,20 @@ using System.Threading.Tasks;
 
 namespace DAL.Repositories
 {
-    public class ManagersRepository : IManagersRepository
+    public class ManagersRepository : IEmployeesRepository
     {
-        private readonly DataContext _context;
+        private readonly CentralDbContext _context;
 
-        public ManagersRepository(DataContext context)
+        public ManagersRepository(CentralDbContext context)
         {
             _context = context;
         }
 
-        public async Task<Manager> CreateManagerAsync(Manager manager)
+        public async Task<Employee> CreateEmployeeAsync(Employee employee)
         {
-            manager.Id = Guid.NewGuid();
-            var result = await _context.Managers.AddAsync(manager);
+            employee.Id = Guid.NewGuid();
+
+            var result = await _context.Employees.AddAsync(employee);
             if (result.Entity != null)
             {
                 await _context.SaveChangesAsync();
@@ -33,14 +35,14 @@ namespace DAL.Repositories
 
         }
 
-        public Task<List<Manager>> GetManagersAsync()
+        public Task<List<Employee>> GetEmployeesAsync()
         {
             throw new NotImplementedException();
         }
 
-        public async Task<Manager> GetManagerbyUserId(string id)
+        public async Task<Employee> GetEmployeeByUserId(Guid id)
         {
-            return await _context.Managers.FirstOrDefaultAsync(manager => manager.IdentityId == id);
+            return await _context.Employees.FirstOrDefaultAsync(manager => manager.IdentityId == id);
         }
     }
 }
