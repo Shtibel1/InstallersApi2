@@ -78,13 +78,6 @@ namespace InstallersApi
 
             services.AddScoped<ICompanyDataProvider, CompanyDataProvider>();
 
-
-
-            services.AddScoped(provider =>
-            {
-                return new CompanyDbContext("Data Source=DESKTOP-9C5JK3S\\SQLEXPRESS;Initial Catalog=Shtibay;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
-            });
-
         }
     }
 }
