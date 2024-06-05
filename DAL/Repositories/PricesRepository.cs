@@ -60,5 +60,13 @@ namespace DAL.Repositories
             return await context.ServiceProviderPricing.FirstOrDefaultAsync(i => i.ProductId == productId && i.InstallerId == installerId);
         }
 
+        public async Task<List<ServiceProviderPricing>> PricesComprasion(List<Guid> ServiceProviderIds, Guid productId)
+        {
+            var context = _companyDataProvider.GetContexts()[0];
+            return await context.ServiceProviderPricing
+                .Where(p => ServiceProviderIds.Contains(p.InstallerId) && p.ProductId == productId && p.InstallationPrice > 0)
+                .ToListAsync();
+        }
     }
 }
+    

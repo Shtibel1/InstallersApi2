@@ -9,11 +9,10 @@ namespace BLL.DTOs
 {
     public class ServiceProviderPricingVm
     {
-        public int Id { get; set; }
         [JsonProperty("productId")]
-        public int ProductId { get; set; }
+        public Guid ProductId { get; set; }
         [JsonProperty("installerId")]
-        public string InstallerId { get; set; }
+        public Guid InstallerId { get; set; }
         [JsonProperty("installationPrice")]
         public double? InstallationPrice { get; set; }
         [JsonProperty("outerFloorPrice")]

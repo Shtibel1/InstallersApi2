@@ -10,11 +10,10 @@ using System.Threading.Tasks;
 namespace BLL.Models
 {
     public class AssignmentVm
-    {
-        [JsonProperty("id")]
+    {        [JsonProperty("id")]
         public Guid Id { get; set; }
         [JsonProperty("businessName")]
-        public Company CompanyName { get; set; }
+        public CompanyNames CompanyName { get; set; }
         [JsonProperty("createdDate")]
         public DateTime CreatedDate { get; set; }
         [JsonProperty("assignmentDate")]
@@ -35,11 +34,11 @@ namespace BLL.Models
         [JsonProperty("customer")]
         public CustomerVm Customer { get; set; }
 
-        [JsonProperty("installer")]
-        public ServiceProviderVm Installer { get; set; }
+        [JsonProperty("serviceProvider")]
+        public ServiceProviderVm ServiceProvider { get; set; }
 
-        [JsonProperty("manager")]
-        public ManagerVm Manager { get; set; }
+        [JsonProperty("employee")]
+        public EmployeeVm Employee { get; set; }
 
         [JsonProperty("comments")]
         public List<CommentVm> Comments { get; set; }
@@ -50,6 +49,20 @@ namespace BLL.Models
 
         [JsonProperty("customerAlreadyPaid")]
         public double? CustomerAlreadyPaid { get; set; }
+
+
+        [JsonProperty("marketer")]
+        public MarketerVm Marketer { get; set; }
+        [JsonProperty("assignmentPrice")]
+        public double AssignmentPrice { get; set; }
+        [JsonProperty("innerFloorPrice")]
+        public double? InnerFloorPrice { get; set; }
+        [JsonProperty("outerFloorPrice")]
+        public double? OuterFloorPrice { get; set; }
+        [JsonProperty("carryPrice")]
+        public double? CarryPrice { get; set; }
+        [JsonProperty("distancePrice")]
+        public double? DistancePrice { get; set; }
     }
 
 }

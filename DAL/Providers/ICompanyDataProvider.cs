@@ -7,7 +7,7 @@ namespace DAL.Providers
     public interface ICompanyDataProvider
     {
         List<string>? GetConnectionStrings();
-        void SetCompanies(List<CompanyNames> companies);
+        void SetCompanies(List<CompanyNames>? companies);
         List<CompanyNames>? GetCompanies();
         List<CompanyDbContext> GetContexts();
         CompanyDbContext GetContext(CompanyNames company);

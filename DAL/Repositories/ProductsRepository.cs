@@ -27,6 +27,7 @@ namespace DAL.Repositories
         public async Task<List<Product>> GetProductsAsync()
         {
             var context = _companyDataProvider.GetContexts()[0];
+
             return await context.Products.Include(p => p.Category).ToListAsync();
         }
 

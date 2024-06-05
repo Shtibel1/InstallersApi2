@@ -1,5 +1,6 @@
 using InstallersApi;
 using InstallersApi.Middlewares;
+using InstallersApi2.Middlewares;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -51,12 +52,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("corsapp");
+app.UseMiddleware<GlobalExceptionMiddleware>();
+app.UseMiddleware<CompanyMiddleware>();
 app.UseWebSockets();
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.MapControllers();
 

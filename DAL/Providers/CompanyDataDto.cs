@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace DAL.Providers
 {
-    public class CompanyData
+    public class CompanyDataDto
     {
         public string ConnectionString { get; }
         public CompanyDbContext Context { get; }
 
-        public CompanyData( string companyConnectionStrings, CompanyDbContext context)
+        public CompanyDataDto( string companyConnectionStrings, CompanyDbContext context)
         {
             this.ConnectionString = companyConnectionStrings;
             this.Context = context;

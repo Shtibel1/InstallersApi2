@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(CompanyDbContext))]
-    [Migration("20240525200719_init")]
+    [Migration("20240527155603_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -24,62 +24,6 @@ namespace DAL.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("CompanyEmployee", b =>
-                {
-                    b.Property<Guid>("CompaniesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("EmployeeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("CompaniesId", "EmployeeId");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("CompanyEmployee");
-                });
-
-            modelBuilder.Entity("CompanyServiceProvider", b =>
-                {
-                    b.Property<Guid>("CompaniesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("serviceProvidersId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("CompaniesId", "serviceProvidersId");
-
-                    b.HasIndex("serviceProvidersId");
-
-                    b.ToTable("CompanyServiceProvider");
-                });
-
-            modelBuilder.Entity("DAL.Abstracts.ServiceProvider", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("IdentityId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ServiceProvider");
-                });
 
             modelBuilder.Entity("DAL.Entities.Assignment", b =>
                 {
@@ -141,7 +85,7 @@ namespace DAL.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int>("companyName")
+                    b.Property<int>("CompanyName")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -196,33 +140,6 @@ namespace DAL.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("DAL.Entities.Company", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Logo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Company");
-                });
-
             modelBuilder.Entity("DAL.Entities.Customer", b =>
                 {
                     b.Property<Guid>("Id")
@@ -249,32 +166,6 @@ namespace DAL.Migrations
                     b.ToTable("Customers");
                 });
 
-            modelBuilder.Entity("DAL.Entities.Employee", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("IdentityId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Employee");
-                });
-
             modelBuilder.Entity("DAL.Entities.Marketer", b =>
                 {
                     b.Property<Guid>("Id")
@@ -299,7 +190,7 @@ namespace DAL.Migrations
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<double?>("CustomerAssignmentPrice")
+                    b.Property<double?>("CustomerInstallationPrice")
                         .HasColumnType("float");
 
                     b.Property<string>("Name")
@@ -325,7 +216,7 @@ namespace DAL.Migrations
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ServiceProviderId")
+                    b.Property<Guid>("ServiceProviderIdExternal")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -341,19 +232,22 @@ namespace DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<double>("AssignmentPrice")
-                        .HasColumnType("float");
-
                     b.Property<double?>("CarryPrice")
                         .HasColumnType("float");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<double?>("DeliveryOnlyPrice")
+                        .HasColumnType("float");
+
                     b.Property<double?>("DistancePrice")
                         .HasColumnType("float");
 
                     b.Property<double?>("InnerFloorPrice")
+                        .HasColumnType("float");
+
+                    b.Property<double>("InstallationPrice")
                         .HasColumnType("float");
 
                     b.Property<Guid>("InstallerId")
@@ -365,46 +259,14 @@ namespace DAL.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ServiceProviderId")
+                    b.Property<Guid>("ServiceProviderIdExternal")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("ServiceProviderId");
-
                     b.ToTable("ServiceProviderPricing");
-                });
-
-            modelBuilder.Entity("CompanyEmployee", b =>
-                {
-                    b.HasOne("DAL.Entities.Company", null)
-                        .WithMany()
-                        .HasForeignKey("CompaniesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DAL.Entities.Employee", null)
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("CompanyServiceProvider", b =>
-                {
-                    b.HasOne("DAL.Entities.Company", null)
-                        .WithMany()
-                        .HasForeignKey("CompaniesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DAL.Abstracts.ServiceProvider", null)
-                        .WithMany()
-                        .HasForeignKey("serviceProvidersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("DAL.Entities.Assignment", b =>
@@ -471,15 +333,7 @@ namespace DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DAL.Abstracts.ServiceProvider", "ServiceProvider")
-                        .WithMany()
-                        .HasForeignKey("ServiceProviderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Product");
-
-                    b.Navigation("ServiceProvider");
                 });
 
             modelBuilder.Entity("DAL.Entities.Assignment", b =>

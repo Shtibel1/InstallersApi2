@@ -14,26 +14,30 @@ namespace DAL.Providers
     public class CompanyDataProvider : ICompanyDataProvider
     {
         private readonly IConfiguration _configuration;
-        private readonly ConcurrentDictionary<CompanyNames, CompanyData> _companyDataDictionary;
+        private readonly ConcurrentDictionary<CompanyNames, CompanyDataDto> _companyDataDictionary;
 
         public CompanyDataProvider(IConfiguration configuration)
         {
             _configuration = configuration;
-            _companyDataDictionary = new ConcurrentDictionary<CompanyNames, CompanyData>();
+            _companyDataDictionary = new ConcurrentDictionary<CompanyNames, CompanyDataDto>();
         }
 
-        public void SetCompanies(List<CompanyNames> companies)
+        public void SetCompanies(List<CompanyNames>? companies)
         {
+            if (companies == null || companies.Count == 0)
+                return;
+
+
             foreach (var company in companies)
             {
-                var connectionString = _configuration.GetValue<string>($"ConnectionString:Companies:{company}");
+                var connectionString = _configuration.GetValue<string>($"ConnectionStrings:{company}");
                 if (string.IsNullOrEmpty(connectionString))
                 {
                     throw new InvalidOperationException($"Connection string for company {company} is missing.");
                 }
 
                 var context = new CompanyDbContext(connectionString);
-                _companyDataDictionary[company] = new CompanyData(connectionString, context);
+                _companyDataDictionary[company] = new CompanyDataDto(connectionString, context);
             }
         }
 

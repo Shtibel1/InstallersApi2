@@ -11,13 +11,13 @@ namespace DAL.Entities
     public class Assignment
     {
         public Guid Id { get; set; }
-        public CompanyNames companyName { get; set; }
+        public CompanyNames CompanyName { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? AssignmentDate { get; set; }
         public double? CustomerNeedsToPay { get; set; }
         public double? CustomerAlreadyPaid { get; set; }
         public double Cost { get; set; }
-        public double? Price { get; set; }
+        public double? Price { get; set; } //will be used to calaulate profits for the company
         public AssignmentStatus Status { get; set; }
         public Guid ProductId { get; set; }
         public Guid CustomerId { get; set; }

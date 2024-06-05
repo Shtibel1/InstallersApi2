@@ -15,11 +15,12 @@ namespace DAL.Entities
         public Guid ProductId { get; set; }
         public Product Product { get; set; }
         public Guid InstallerId { get; set; }
-        public ServiceProvider ServiceProvider { get; set; }
-        public double AssignmentPrice { get; set; }
+        public Guid ServiceProviderIdExternal { get; set; }
+        public double InstallationPrice { get; set; }
         public double? InnerFloorPrice { get; set; }
         public double? OuterFloorPrice { get; set; }
         public double? CarryPrice { get; set; }
         public double? DistancePrice { get; set; }
+        public double? DeliveryOnlyPrice { get; set; }
     }
 }

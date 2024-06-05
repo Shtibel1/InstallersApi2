@@ -1,5 +1,6 @@
 ﻿using BLL.DTOs;
 using BLL.Interfaces;
+using BLL.Vms;
 using DAL.Entities;
 using DAL.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -67,6 +68,13 @@ namespace InstallersApi2.Controllers
             }
         }
 
+        [HttpPost("prices-comparison")]
+        [Authorize]
+        public async Task<ActionResult<List<ServiceProviderPricingVm>>> GetPricesComparison(PricesComparisonRequest pricesComparisonRequest)
+        {
+            return Ok(await _InstallerPricingService.PricesComprasion(pricesComparisonRequest));
+        }
+
         /*[HttpPost]
         public async Task<ActionResult<List<InstallerPricing>>> PostPrice(List<InstallerPricing> InstallerPricing)
         {
@@ -81,4 +89,6 @@ namespace InstallersApi2.Controllers
         }*/
 
     }
+
+    
 }

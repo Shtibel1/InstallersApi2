@@ -1,6 +1,7 @@
 ﻿using BLL.Interfaces;
 using BLL.Models;
 using DAL.Enums;
+using DAL.Providers;
 using DAL.Repositories.Assignments;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
@@ -16,21 +17,24 @@ namespace InstallersApi2.Controllers
     public class AssignmentsController : ControllerBase
     {
         private readonly IAssignmentsService _assignmentService;
+        private readonly ICompanyDataProvider _companyDataProvider;
 
-        public AssignmentsController(IAssignmentsService assignmentService)
+        public AssignmentsController(IAssignmentsService assignmentService, ICompanyDataProvider companyDataProvider)
         {
             _assignmentService = assignmentService;
+            _companyDataProvider = companyDataProvider;
         }
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignments(AssignmentsFilters? filters)
         {
+
             return await GetAssignmentsInternal(User.FindFirstValue(ClaimTypes.NameIdentifier), User.FindFirstValue(ClaimTypes.Role), filters);
         }
 
         [HttpPost("filter")]
-        
+
         public async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignmentsByInstaller(filtersVm filters)
-        {   
+        {
             if (string.IsNullOrWhiteSpace(filters.InstallerId))
             {
                 return BadRequest("Invalid installer ID");
@@ -43,102 +47,71 @@ namespace InstallersApi2.Controllers
 
         private async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignmentsInternal(string userId, string role, AssignmentsFilters? filters)
         {
-            try
-            {
-                var assignmentsDto = await _assignmentService.GetAssignmentsAsync(userId, role, filters);
-                return Ok(assignmentsDto);
-            }
-            catch (Exception ex)
-            {
-                // Consider logging the exception details here
-                return BadRequest("FAILED_GET_ASSIGNMENTS");
-            }
+
+            var assignmentsDto = await _assignmentService.GetAssignmentsAsync(userId, role, filters);
+            return Ok(assignmentsDto);
         }
 
-        [HttpGet("{companyName}/{id}")]
+        [HttpGet("{CompanyName}/{id}")]
         public async Task<ActionResult<AssignmentVm>> GetAssignment(CompanyNames companyName, Guid id)
         {
-            try
+
+            var assignment = await _assignmentService.GetAssignmentAsync(id, companyName);
+
+            if (assignment == null)
             {
-                var assignment = await _assignmentService.GetAssignmentAsync(id, companyName);
-
-                if (assignment == null)
-                {
-                    return Ok();
-                }
-
-                return Ok(assignment);
+                return Ok();
             }
-            catch (Exception)
-            {
 
-                return BadRequest("FAILED_GET_ASSIGNMENT");
-            }
-            
+            return Ok(assignment);
+
         }
 
         [HttpPut("{id}")]
         [Authorize(Roles = nameof(Role.Employee))]
         public async Task<IActionResult> PutAssignment(Guid id, CreateAssignmentVm assignment)
         {
-            try
+            if (_companyDataProvider?.GetCompanies()?[0] == null)
             {
-                var updatedAssignment = await _assignmentService.UpdateAssignmentAsync(id, assignment);
-                return Ok(updatedAssignment);
+                return BadRequest("INVALID_COMPANY_NAME");
             }
-            catch (Exception ex)
-            {
-                return BadRequest("FAILED_UPDATE_ASSIGNMENT");
-            }
+
+
+            var updatedAssignment = await _assignmentService.UpdateAssignmentAsync(id, assignment, _companyDataProvider.GetCompanies()[0]);
+            return Ok(updatedAssignment);
+
         }
 
-        [HttpPatch("{companyName}/{id}")]
+        [HttpPatch("{CompanyName}/{id}")]
         [Authorize]
         public async Task<IActionResult> PatchAssignment(CompanyNames companyName, Guid id, [FromBody] JsonPatchDocument assignment)
         {
-            try
-            {
-                await _assignmentService.PatchAssignmentAsync(id, assignment, companyName);
 
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest("FAILED_UPDATE_ASSIGNMENT");
-            }
+            await _assignmentService.PatchAssignmentAsync(id, assignment, companyName);
+
+            return NoContent();
+
         }
 
         [HttpPost]
         // [Authorize(Roles = Roles.Manager)]
         public async Task<ActionResult<AssignmentVm>> PostAssignment(CreateAssignmentVm assignment)
         {
-            try
-            {
-                
-                var newAssignment = await _assignmentService.CreateAssignmentAsync(assignment);
-                return Ok(newAssignment);
-            }
-            catch (Exception ex)
-            {
 
-                return BadRequest("FAILED_CREATE_ASSIGNMENT");
-            }
+            var newAssignment = await _assignmentService.CreateAssignmentAsync(assignment, _companyDataProvider.GetCompanies()[0]);
+            return Ok(newAssignment);
+
         }
 
         // DELETE: api/Assignments/5
-        [HttpDelete("{companyName}/{id}")]
+        [HttpDelete("{id}")]
         [Authorize(Roles = nameof(Role.Employee))]
-        public async Task<IActionResult> DeleteAssignment(CompanyNames companyName, Guid id)
+        public async Task<IActionResult> DeleteAssignment(Guid id)
         {
-            try
-            {
-                await _assignmentService.DeleteAssignmentAsync(id, companyName);
-                return NoContent();
-            }
-            catch (Exception)
-            {
-                return BadRequest("FAILED_DELETE_ASSIGNMENT");
-            }
+
+            await _assignmentService.DeleteAssignmentAsync(id, _companyDataProvider.GetCompanies()[0]);
+            return NoContent();
+
         }
 
 

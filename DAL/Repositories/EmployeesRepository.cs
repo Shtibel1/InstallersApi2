@@ -1,4 +1,5 @@
-﻿using DAL.Data;
+﻿using DAL.Abstracts;
+using DAL.Data;
 using DAL.Entities;
 using DAL.Enums;
 using DAL.Interfaces;
@@ -11,11 +12,11 @@ using System.Threading.Tasks;
 
 namespace DAL.Repositories
 {
-    public class ManagersRepository : IEmployeesRepository
+    public class EmployeesRepository : IEmployeesRepository
     {
         private readonly CentralDbContext _context;
 
-        public ManagersRepository(CentralDbContext context)
+        public EmployeesRepository(CentralDbContext context)
         {
             _context = context;
         }
@@ -42,7 +43,9 @@ namespace DAL.Repositories
 
         public async Task<Employee> GetEmployeeByUserId(Guid id)
         {
-            return await _context.Employees.FirstOrDefaultAsync(manager => manager.IdentityId == id);
+            return await _context.Employees.Include(e => e.Companies).FirstOrDefaultAsync(emp => emp.IdentityId == id);
         }
+
+
     }
 }

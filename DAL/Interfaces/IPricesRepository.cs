@@ -14,5 +14,7 @@ namespace DAL.Repositories
         Task DeleteInstallerPricingAsync(Guid installerId);
 
         Task<ServiceProviderPricing> GetServiceProviderPicing(Guid installerId, Guid productId);
+        Task<List<ServiceProviderPricing>> PricesComprasion(List<Guid> ServiceProviderIds, Guid productId);
+
     }
 }

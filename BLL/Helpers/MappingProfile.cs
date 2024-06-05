@@ -4,6 +4,7 @@ using BLL.Models;
 using BLL.Services.AuthService;
 using DAL.Abstracts;
 using DAL.Entities;
+using DAL.Enums;
 
 namespace DAL.Helpers
 {
@@ -22,7 +23,13 @@ namespace DAL.Helpers
                 })
                 .ReverseMap();
 
-            CreateMap<Assignment, AssignmentVm>().ReverseMap();
+            CreateMap<Assignment, AssignmentVm>()
+                .AfterMap((src, dest) =>
+                {
+                    dest.ServiceProvider = new ServiceProviderVm() { Id = src.ServiceProviderId };
+                });
+
+            CreateMap<ServiceProvider, ServiceProviderVm>().ReverseMap();
 
 
             CreateMap<Category, CategoryVm>().ReverseMap();
@@ -32,25 +39,50 @@ namespace DAL.Helpers
             .ReverseMap()
             .ForMember(dest => dest.ServiceProviderCategories, opt => opt.MapFrom(src => src.Categories.Select(c => new ServiceProviderCategories { CategoryId = c.Id ?? Guid.NewGuid() })));*/
             
+            
+
+
+            CreateMap<ServiceProviderPricing, ServiceProviderPricingVm>().ReverseMap();
+            CreateMap<Product, ProductVm>().ReverseMap();
+
+            CreateMap<Marketer, MarketerVm>().ReverseMap();
+
+
+
+
+            //creation
+
+            CreateMap<CreateServiceProviderVm, ServiceProvider>()
+                .AfterMap((src, dest) =>
+                {
+                    dest.Id = Guid.NewGuid();
+                })
+                .ReverseMap();
+
             CreateMap<SignupModel, AppUser>()
                 .ForMember(des => des.UserName, src => src.MapFrom(act => act.Name))
                 .ForMember(des => des.PhoneNumber, src => src.MapFrom(act => act.Phone));
 
             CreateMap<SignupModel, Employee>();
 
-            CreateMap<SignupModel, ServiceProvider>();
-            CreateMap<Company, CompanyVm>().ReverseMap();
+            CreateMap<SignupModel, CreateServiceProviderVm>()
+            .ForMember(dest => dest.Categories, opt => opt.Condition(src => src.Role == Role.ServiceProvider && src.Categories != null));
+
+            CreateMap<CreateServiceProviderVm, ServiceProvider>()
+            .ForMember(dest => dest.Role, opt => opt.MapFrom(src => Role.ServiceProvider.ToString()))
+            .ForMember(dest => dest.Companies, opt => opt.Ignore());
 
 
-            CreateMap<ServiceProviderPricing, ServiceProviderPricingVm>().ReverseMap();
-            CreateMap<Product, ProductVm>().ReverseMap();
-                
+            CreateMap<Company, CompanyVm>()
+            .ForMember(dest => dest.Name, opt => opt.MapFrom<CompanyNameResolver>());
+        }
+    }
 
-            
-
-
-
-
+    public class CompanyNameResolver : IValueResolver<Company, CompanyVm, CompanyNames>
+    {
+        public CompanyNames Resolve(Company source, CompanyVm destination, CompanyNames destMember, ResolutionContext context)
+        {
+            return Enum.TryParse<CompanyNames>(source.Name, out var result) ? result : CompanyNames.Unkown;
         }
     }
 }

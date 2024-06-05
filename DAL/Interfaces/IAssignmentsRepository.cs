@@ -13,8 +13,8 @@ namespace DAL.Repositories
     {
         Task<List<Assignment>> GetAssignmentsAsync(AssignmentsFilters? filters);
         Task<Assignment> GetAssignmentAsync(Guid id, CompanyNames company);
-        Task<Assignment> CreateAssignmentAsync(Assignment assignment);
-        Task<Assignment> UpdateAssignmentAsync(Guid id, Assignment assignment);
+        Task<Guid> CreateAssignmentAsync(Assignment assignment);
+        Task UpdateAssignmentAsync(Guid id, Assignment assignment);
         Task DeleteAssignmentAsync(Guid id, CompanyNames company);
         Task PatchAssignmentAsync(Guid id, JsonPatchDocument assignment, CompanyNames company);
     }

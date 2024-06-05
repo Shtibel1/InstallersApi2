@@ -22,13 +22,15 @@ namespace DAL.Repositories
             return await context.Categories.ToListAsync();
         }
 
-        public async Task<List<Category>> GetCategoriesByServiceProvidersAsync(IEnumerable<Guid> serviceProviderIds)
+        public async Task<Dictionary<Guid, List<Category>>> GetCategoriesByServiceProvidersAsync(List<Guid> serviceProviderIds)
         {
             var context = _companyDataProvider.GetContexts()[0];
+
             return await context.ServiceProviderCategories
-                .Where(spc => serviceProviderIds.Contains(spc.ServiceProviderId))
-                .Select(spc => spc.Category)
-                .ToListAsync();
+                .Where(spc => serviceProviderIds.Contains(spc.ServiceProviderIdExternal))
+                .Include(spc => spc.Category)
+                .GroupBy(spc => spc.ServiceProviderIdExternal)
+                .ToDictionaryAsync(g => g.Key, g => g.Select(spc => spc.Category).ToList());
         }
 
         public async Task<Category> GetCategoryAsync(Guid id)
@@ -71,17 +73,20 @@ namespace DAL.Repositories
             await context.SaveChangesAsync();
         }
 
-        public async Task AddCategoriesToServiceProviderAsync(Guid serviceProviderId, List<Guid> categoryIds)
+        public async Task<List<Category>> AddCategoriesToServiceProviderAsync(Guid serviceProviderId, List<Guid> categoryIds)
         {
             var context = _companyDataProvider.GetContexts()[0];
+
             var serviceProviderCategories = categoryIds.Select(categoryId => new ServiceProviderCategory
             {
-                ServiceProviderId = serviceProviderId,
+                ServiceProviderIdExternal = serviceProviderId,
                 CategoryId = categoryId
             });
 
             await context.ServiceProviderCategories.AddRangeAsync(serviceProviderCategories);
             await context.SaveChangesAsync();
+            
+            return await context.Categories.Where(c => categoryIds.Contains(c.Id)).ToListAsync();
         }
 
 

@@ -6,6 +6,7 @@ using DAL.Entities;
 using DAL.Enums;
 using DAL.Interfaces;
 using DAL.Providers;
+using DAL.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,41 +15,71 @@ using System.Threading.Tasks;
 
 namespace BLL.Services
 {
-    public class ServiceProvidersService : IServiceProvidersService
+    public class ServiceProvidersService : ISPService
     {
-        private readonly IServiceProviderRepository _accountRepository;
+        private readonly IServiceProvidersRepository _accountRepository;
         private readonly IMapper _mapper;
         private readonly ICompanyDataProvider _companyDataProvider;
+        private readonly ICategoriesRepository _categoriesRepository;
 
-        public ServiceProvidersService(IServiceProviderRepository accountRepository, IMapper mapper, ICompanyDataProvider companyDataProvider)
+        public ServiceProvidersService(IServiceProvidersRepository accountRepository, IMapper mapper, ICompanyDataProvider companyDataProvider, ICategoriesRepository categoriesRepository)
         {
             _accountRepository = accountRepository;
             _mapper = mapper;
             _companyDataProvider = companyDataProvider;
+            _categoriesRepository = categoriesRepository;
         }
 
         public async Task<ServiceProviderVm> CreateServiceProviderAsync(CreateServiceProviderVm ServiceProvider)
         {
             var entity = _mapper.Map<ServiceProvider>(ServiceProvider);
-            var newIns = _mapper.Map<ServiceProviderVm>(await _accountRepository.CreateserviceProviderAsync(entity));
-            return newIns;
+            var company = _companyDataProvider.GetCompanies()[0];
+            var createdServiceProvider = await _accountRepository.CreateServiceProviderAsync(entity, company);   
+
+            var categories = await _categoriesRepository.AddCategoriesToServiceProviderAsync(createdServiceProvider.Id, ServiceProvider.Categories);
+
+            var insVms = _mapper.Map<ServiceProviderVm>(createdServiceProvider); 
+            var catVms =  _mapper.Map<List<CategoryVm>>(categories);
+
+            insVms.Categories = catVms;
+
+            return insVms;
         }
 
         public async Task<List<ServiceProviderVm>> GetServiceProvidersAsync(List<CompanyNames> companyNames)
         {
-             
 
-            var entities = await _accountRepository.GetServiceProvidersByCompaniesAsync(companyNames);
-            
-            var vms = _mapper.Map<List<ServiceProviderVm>>(entities);
+            var vms = new List<ServiceProviderVm>();
+            var serviceProviders = await _accountRepository.GetServiceProvidersByCompaniesAsync(companyNames);
+            var serviceProviderIds = serviceProviders.Select(sp => sp.Id).ToList();
+            var serviceProviderCategories = await _categoriesRepository.GetCategoriesByServiceProvidersAsync(serviceProviderIds);
+
+            foreach (var serviceProvider in serviceProviders)
+            {
+                var serviceProviderVm = new ServiceProviderVm 
+                {
+                    Id = serviceProvider.Id,
+                    Name = serviceProvider.Name,
+                    Phone = serviceProvider.Phone,
+                    Role = Enum.Parse<Role>(serviceProvider.Role) 
+                };
+                if (serviceProviderCategories.ContainsKey(serviceProvider.Id))
+                {
+                    
+                    serviceProviderVm.Categories = _mapper.Map<List<CategoryVm>>(serviceProviderCategories[serviceProvider.Id]);
+                    vms.Add(serviceProviderVm);
+                }
+
+            }
 
             return vms;
+
         }
 
-        public async Task<List<ServiceProviderVm>> GetServiceProviderAsync(Guid id)
+        public async Task<ServiceProviderVm> GetServiceProviderAsync(Guid id)
         {
             var entity = await _accountRepository.GetserviceProviderAsync(id);
-            return _mapper.Map<List<ServiceProviderVm>>(entity);
+            return _mapper.Map<ServiceProviderVm>(entity);
         }
     }
 }

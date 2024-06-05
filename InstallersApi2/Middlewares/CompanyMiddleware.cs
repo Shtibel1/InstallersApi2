@@ -28,8 +28,10 @@ namespace InstallersApi2.Middlewares
             await _next(context);
         }
 
-        private List<CompanyNames> GetCompaniesFromToken(string token)
+        private List<CompanyNames> GetCompaniesFromToken(string? token)
         {
+            if (string.IsNullOrEmpty(token)) return null;
+
             var handler = new JwtSecurityTokenHandler();
             var jwtToken = handler.ReadJwtToken(token);
             var companies = jwtToken.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.Companies);

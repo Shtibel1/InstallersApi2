@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using BLL.DTOs;
+using BLL.Interfaces;
+using BLL.Models;
 using Business;
 using Business.Models;
 using DAL.Abstracts;
@@ -25,7 +27,7 @@ namespace BLL.Services.AuthService
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
         private readonly IEmployeesRepository _employeesRepository;
-        private readonly IServiceProviderRepository _serviceProvidersRepository;
+        private readonly ISPService _serviceProvidersService;
         private readonly ICategoriesRepository _categoriesRepository;
 
         public AuthService(
@@ -35,7 +37,7 @@ namespace BLL.Services.AuthService
            IConfiguration configuration,
            IMapper mapper,
            IEmployeesRepository employeesRepository,
-           IServiceProviderRepository serviceProvidersRepository,
+           ISPService serviceProvidersService,
            ICategoriesRepository categoriesRepository)
         {
             _userManager = userManager;
@@ -44,7 +46,7 @@ namespace BLL.Services.AuthService
             _configuration = configuration;
             _mapper = mapper;
             _employeesRepository = employeesRepository;
-            _serviceProvidersRepository = serviceProvidersRepository;
+            _serviceProvidersService = serviceProvidersService;
             _categoriesRepository = categoriesRepository;
         }
 
@@ -76,10 +78,9 @@ namespace BLL.Services.AuthService
                     token = GenerateToken(user, role, employee.Companies.Select(c => c.Name).ToList());
                     break;
                 case Role.ServiceProvider:
-                    var serviceProvider = await _serviceProvidersRepository.GetserviceProviderbyUserId(user.Id);
+                    var serviceProvider = await _serviceProvidersService.GetServiceProviderAsync(user.Id);
                     userId = serviceProvider.Id;
-                    companiesVm = serviceProvider.Companies.Select(c => _mapper.Map<CompanyVm>(c)).ToList();
-                    token = GenerateToken(user, role, serviceProvider.Companies.Select(s => s.Name).ToList());
+                    token = GenerateToken(user, role, serviceProvider.CompanyNames.Select(n => n.ToString()).ToList());
                     break;
                 default:
                     return null;
@@ -88,7 +89,7 @@ namespace BLL.Services.AuthService
 
 
 
-            return new AppUserVm { Id = userId, Name = user.UserName, Token = token, Role = roles[0], Companies = companiesVm };
+            return new AppUserVm { Id = userId, Name = user.UserName, Token = token, Role = Enum.Parse<Role>(roles[0]), Companies = companiesVm };
         }
 
         public async Task<SignupServiceResponse?> SignupAsync(SignupModel signUp)
@@ -113,9 +114,8 @@ namespace BLL.Services.AuthService
                     return await _employeesRepository.CreateEmployeeAsync(managerEntity);
 
                 case Role.ServiceProvider:
-                    var serviceProviderEntity = _mapper.Map<ServiceProvider>(signUp);
-                    serviceProviderEntity.IdentityId = identityId;
-                    var createdServiceProvider = await _serviceProvidersRepository.CreateserviceProviderAsync(serviceProviderEntity);
+                    var createServiceProvider = _mapper.Map<CreateServiceProviderVm>(signUp);
+                    var createdServiceProvider = await _serviceProvidersService.CreateServiceProviderAsync(createServiceProvider);
                     await _categoriesRepository.AddCategoriesToServiceProviderAsync(createdServiceProvider.Id, signUp.Categories);
                     return createdServiceProvider;
 

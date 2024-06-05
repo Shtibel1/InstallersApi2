@@ -1,4 +1,5 @@
 ﻿using BLL.DTOs;
+using BLL.Vms;
 using DAL.Entities;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace BLL.Interfaces
         Task<List<ServiceProviderPricingVm>> GetPricingByServiceProviderAsync(Guid installerId);
         Task<List<ServiceProviderPricingVm>> UpdateServiceProviderPricingAsync(Guid installerId, List<ServiceProviderPricingVm> InstallerPricing);
         Task<ServiceProviderPricingVm> GetServiceProviderPricingByProductVmAsync(Guid installerId, Guid productId);
+        Task<List<ServiceProviderPricingVm>> PricesComprasion(PricesComparisonRequest pricesComparisonRequest);
 
     }
 }

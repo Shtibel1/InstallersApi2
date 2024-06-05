@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace BLL.Models
 {
-    public class ManagerVm 
+    public class EmployeeVm 
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

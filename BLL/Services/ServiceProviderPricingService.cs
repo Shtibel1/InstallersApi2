@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BLL.DTOs;
 using BLL.Interfaces;
+using BLL.Vms;
 using DAL.Entities;
 using DAL.Repositories;
 
@@ -40,6 +41,13 @@ namespace BLL.Services
         {
             var prices = await _InstallerPricingRepository.GetServiceProviderPicing(installerId, productId);
             var pricesVm = _mapper.Map<ServiceProviderPricingVm>(prices);
+            return pricesVm;
+        }
+
+        public async Task<List<ServiceProviderPricingVm>> PricesComprasion(PricesComparisonRequest pricesComparisonRequest)
+        {
+            var prices = await _InstallerPricingRepository.PricesComprasion(pricesComparisonRequest.ServiceProviderIds, pricesComparisonRequest.ProductId);
+            var pricesVm = _mapper.Map<List<ServiceProviderPricingVm>>(prices);
             return pricesVm;
         }
 

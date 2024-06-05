@@ -9,11 +9,12 @@ using System.Threading.Tasks;
 
 namespace DAL.Interfaces
 {
-    public interface IServiceProviderRepository
+    public interface IServiceProvidersRepository
     {
         Task<List<ServiceProvider>> GetServiceProvidersByCompaniesAsync(List<CompanyNames> companyNames);
-        Task<List<ServiceProvider>> GetserviceProviderAsync(Guid id);
-        Task<ServiceProvider> CreateserviceProviderAsync(ServiceProvider installer);
+        Task<ServiceProvider> GetserviceProviderAsync(Guid id);
+        Task<ServiceProvider> CreateServiceProviderAsync(ServiceProvider serviceProvider, CompanyNames companyName);
         Task<ServiceProvider?> GetserviceProviderbyUserId(Guid id);
+        Task<List<ServiceProvider>> GetServiceProvidersByIds(List<Guid> Ids);
     }
 }

@@ -8,18 +8,18 @@ namespace DAL.Data
     {
         private readonly string _connectionString;
 
-        public CompanyDbContext(string connectionString)
+        public CompanyDbContext(string connectionString) 
         {
             _connectionString = connectionString;
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 
         {
 
             
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Data Source=DESKTOP-9C5JK3S\\SQLEXPRESS;Initial Catalog=Shtibay;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
+                optionsBuilder.UseSqlServer(_connectionString);
             }
         }
 

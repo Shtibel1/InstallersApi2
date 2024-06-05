@@ -1,12 +1,13 @@
 ﻿using DAL.Abstracts;
 using DAL.Data;
+using DAL.Entities;
 using DAL.Enums;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Repositories
 {
-    public class ServiceProviderRepository : IServiceProviderRepository
+    public class ServiceProviderRepository : IServiceProvidersRepository
     {
         private readonly CentralDbContext _context;
 
@@ -27,22 +28,40 @@ namespace DAL.Repositories
             return serviceProviders;
         }
 
-        public async Task<ServiceProvider> CreateserviceProviderAsync(ServiceProvider serviceProvider)
+        public async Task<ServiceProvider> CreateServiceProviderAsync(ServiceProvider serviceProvider, CompanyNames companyName)
         {
             serviceProvider.Id = Guid.NewGuid();
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            await _context.ServiceProviders.AddAsync(serviceProvider);
-            await _context.SaveChangesAsync();
-            return serviceProvider;
+            try
+            {
+                var company = await _context.Companies
+                    .FirstOrDefaultAsync(c => c.Name == companyName.ToString());
 
+                if (company != null)
+                {
+                    serviceProvider.Companies.Add(company);
+                }
+
+                await _context.ServiceProviders.AddAsync(serviceProvider);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return serviceProvider;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw ex;
+            }
         }
 
-        public async Task<List<ServiceProvider>> GetserviceProviderAsync(Guid id)
+        public async Task<ServiceProvider> GetserviceProviderAsync(Guid id)
         {
             var serviceProvider = await _context.ServiceProviders
                 .FirstOrDefaultAsync(i => i.Id == id);
 
-            return serviceProvider != null ? new List<ServiceProvider> { serviceProvider } : new List<ServiceProvider>();
+            return serviceProvider;
 
         }
 
@@ -51,6 +70,13 @@ namespace DAL.Repositories
             return await _context.ServiceProviders
                 .Include(sp => sp.Companies)
                 .FirstOrDefaultAsync(manager => manager.IdentityId == id);
+        }
+
+        public async Task<List<ServiceProvider>> GetServiceProvidersByIds(List<Guid> Ids)
+        {
+            return await _context.ServiceProviders
+                .Where(sp => Ids.Contains(sp.Id))
+                .ToListAsync();
         }
     }
 

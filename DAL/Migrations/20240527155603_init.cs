@@ -24,22 +24,6 @@ namespace DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Company",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Logo = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Company", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Customers",
                 columns: table => new
                 {
@@ -55,21 +39,6 @@ namespace DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Employee",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IdentityId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Employee", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Marketers",
                 columns: table => new
                 {
@@ -82,28 +51,13 @@ namespace DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ServiceProvider",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IdentityId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ServiceProvider", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Products",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CustomerInstallationPrice = table.Column<double>(type: "float", nullable: true),
                     Position = table.Column<int>(type: "int", nullable: true),
-                    CustomerAssignmentPrice = table.Column<double>(type: "float", nullable: true),
                     CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -122,7 +76,7 @@ namespace DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ServiceProviderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ServiceProviderIdExternal = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -132,54 +86,6 @@ namespace DAL.Migrations
                         name: "FK_ServiceProviderCategories_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CompanyEmployee",
-                columns: table => new
-                {
-                    CompaniesId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    EmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CompanyEmployee", x => new { x.CompaniesId, x.EmployeeId });
-                    table.ForeignKey(
-                        name: "FK_CompanyEmployee_Company_CompaniesId",
-                        column: x => x.CompaniesId,
-                        principalTable: "Company",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CompanyEmployee_Employee_EmployeeId",
-                        column: x => x.EmployeeId,
-                        principalTable: "Employee",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CompanyServiceProvider",
-                columns: table => new
-                {
-                    CompaniesId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    serviceProvidersId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CompanyServiceProvider", x => new { x.CompaniesId, x.serviceProvidersId });
-                    table.ForeignKey(
-                        name: "FK_CompanyServiceProvider_Company_CompaniesId",
-                        column: x => x.CompaniesId,
-                        principalTable: "Company",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CompanyServiceProvider_ServiceProvider_serviceProvidersId",
-                        column: x => x.serviceProvidersId,
-                        principalTable: "ServiceProvider",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -239,12 +145,13 @@ namespace DAL.Migrations
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     InstallerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ServiceProviderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AssignmentPrice = table.Column<double>(type: "float", nullable: false),
+                    ServiceProviderIdExternal = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    InstallationPrice = table.Column<double>(type: "float", nullable: false),
                     InnerFloorPrice = table.Column<double>(type: "float", nullable: true),
                     OuterFloorPrice = table.Column<double>(type: "float", nullable: true),
                     CarryPrice = table.Column<double>(type: "float", nullable: true),
-                    DistancePrice = table.Column<double>(type: "float", nullable: true)
+                    DistancePrice = table.Column<double>(type: "float", nullable: true),
+                    DeliveryOnlyPrice = table.Column<double>(type: "float", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -253,12 +160,6 @@ namespace DAL.Migrations
                         name: "FK_ServiceProviderPricing_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ServiceProviderPricing_ServiceProvider_ServiceProviderId",
-                        column: x => x.ServiceProviderId,
-                        principalTable: "ServiceProvider",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -305,16 +206,6 @@ namespace DAL.Migrations
                 column: "AssignmentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CompanyEmployee_EmployeeId",
-                table: "CompanyEmployee",
-                column: "EmployeeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CompanyServiceProvider_serviceProvidersId",
-                table: "CompanyServiceProvider",
-                column: "serviceProvidersId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Products_CategoryId",
                 table: "Products",
                 column: "CategoryId");
@@ -328,11 +219,6 @@ namespace DAL.Migrations
                 name: "IX_ServiceProviderPricing_ProductId",
                 table: "ServiceProviderPricing",
                 column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ServiceProviderPricing_ServiceProviderId",
-                table: "ServiceProviderPricing",
-                column: "ServiceProviderId");
         }
 
         /// <inheritdoc />
@@ -342,12 +228,6 @@ namespace DAL.Migrations
                 name: "Comments");
 
             migrationBuilder.DropTable(
-                name: "CompanyEmployee");
-
-            migrationBuilder.DropTable(
-                name: "CompanyServiceProvider");
-
-            migrationBuilder.DropTable(
                 name: "ServiceProviderCategories");
 
             migrationBuilder.DropTable(
@@ -355,15 +235,6 @@ namespace DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "Assignments");
-
-            migrationBuilder.DropTable(
-                name: "Employee");
-
-            migrationBuilder.DropTable(
-                name: "Company");
-
-            migrationBuilder.DropTable(
-                name: "ServiceProvider");
 
             migrationBuilder.DropTable(
                 name: "Customers");

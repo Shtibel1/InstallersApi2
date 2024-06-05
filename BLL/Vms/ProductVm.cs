@@ -9,7 +9,7 @@ namespace BLL.Models
 {
     public class ProductVm
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("place")]
@@ -17,7 +17,7 @@ namespace BLL.Models
         [JsonProperty("customerInstallationPrice")]
         public double? CustomerInstallationPrice { get; set; }
         [JsonProperty("categoryId")]
-        public int CategoryId { get; set; }
+        public Guid CategoryId { get; set; }
         [JsonProperty("category")]
         public CategoryVm? Category { get; set; }
     }

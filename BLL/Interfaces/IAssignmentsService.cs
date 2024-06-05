@@ -15,8 +15,8 @@ namespace BLL.Interfaces
     {
         Task<List<AssignmentVm>> GetAssignmentsAsync(string id, string role, AssignmentsFilters? filters);
         Task<AssignmentVm> GetAssignmentAsync(Guid id, CompanyNames companyNames);
-        Task<AssignmentVm> CreateAssignmentAsync(CreateAssignmentVm assignment);
-        Task<AssignmentVm> UpdateAssignmentAsync(Guid id, CreateAssignmentVm assignment);
+        Task<AssignmentVm> CreateAssignmentAsync(CreateAssignmentVm assignment, CompanyNames companyNames);
+        Task<AssignmentVm> UpdateAssignmentAsync(Guid id, CreateAssignmentVm assignment, CompanyNames companyName);
         Task DeleteAssignmentAsync(Guid id, CompanyNames companyName);
         Task PatchAssignmentAsync(Guid id, JsonPatchDocument assignment, CompanyNames companyName);
 

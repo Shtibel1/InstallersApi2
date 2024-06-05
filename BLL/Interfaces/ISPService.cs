@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace BLL.Interfaces
 {
-    public interface IServiceProvidersService
+    public interface ISPService
     {
         Task<List<ServiceProviderVm>> GetServiceProvidersAsync(List<CompanyNames> companyNames);
-        Task<List<ServiceProviderVm>> GetServiceProviderAsync(Guid id);
+        Task<ServiceProviderVm> GetServiceProviderAsync(Guid id);
         Task<ServiceProviderVm> CreateServiceProviderAsync(CreateServiceProviderVm installer);
     }
 }

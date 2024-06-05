@@ -22,10 +22,10 @@ namespace ServiceProvidersApi2.Controllers
     [ApiController]
     public class ServiceProvidersController : ControllerBase
     {
-        private readonly IServiceProvidersService _ServiceProvidersService;
+        private readonly ISPService _ServiceProvidersService;
         private readonly ICompanyDataProvider _companyDataProvider;
 
-        public ServiceProvidersController(IServiceProvidersService ServiceProvidersService, ICompanyDataProvider companyDataProvider)
+        public ServiceProvidersController(ISPService ServiceProvidersService, ICompanyDataProvider companyDataProvider)
         {
             _ServiceProvidersService = ServiceProvidersService;
             _companyDataProvider = companyDataProvider;

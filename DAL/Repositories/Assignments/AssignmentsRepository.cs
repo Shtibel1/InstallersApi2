@@ -21,16 +21,16 @@ namespace DAL.Repositories.Assignments
         {
             var context = _companyDataProvider.GetContext(company);
 
-            Assignment? assignment = null;
 
-            context.Assignments
+            var assignments = await context.Assignments
                 .Include(a => a.Product)
                 .ThenInclude(p => p.Category)
                 .Include(a => a.Customer)
                 .Include(a => a.Comments)
-                .FirstOrDefault(a => a.Id == id);
+                .Include(a => a.Marketer)
+                .FirstOrDefaultAsync(a => a.Id == id);
 
-            return assignment;
+            return assignments;
 
         }
 
@@ -56,9 +56,10 @@ namespace DAL.Repositories.Assignments
             return assignments.SelectMany(a => a).ToList();
         }
 
-        public async Task<Assignment> CreateAssignmentAsync(Assignment assignment)
+        public async Task<Guid> CreateAssignmentAsync(Assignment assignment)
         {
-            var context = _companyDataProvider.GetContext(assignment.companyName);  
+            var context = _companyDataProvider.GetContext(assignment.CompanyName);  
+            assignment.PickupStatus = PickupStatus.NotReady;
 
             var savedAssignment = await context.Assignments.AddAsync(assignment).ConfigureAwait(false);
             await context.SaveChangesAsync();
@@ -69,17 +70,17 @@ namespace DAL.Repositories.Assignments
                 .Include(a => a.Comments)
                 .FirstOrDefaultAsync(a => a.Id == savedAssignment.Entity.Id);
 
-            return newAssignment;
+            return newAssignment.Id;
         }
-        public async Task<Assignment> UpdateAssignmentAsync(Guid id, Assignment assignment)
+        public async Task UpdateAssignmentAsync(Guid id, Assignment assignment)
         {
-            var context = _companyDataProvider.GetContext(assignment.companyName);
+            var context = _companyDataProvider.GetContext(assignment.CompanyName);
 
-            assignment.Id = id;
+            context.Entry(assignment).State = EntityState.Detached;
             context.Assignments.Update(assignment);
+
             await context.SaveChangesAsync();
 
-            return await GetAssignmentAsync(id, assignment.companyName);
         }
 
         public async Task DeleteAssignmentAsync(Guid id, CompanyNames company)

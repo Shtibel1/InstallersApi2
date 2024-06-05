@@ -19,6 +19,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using DAL.Providers;
 using DAL.Repositories.Assignments;
+using InstallersApi2.Controllers;
 
 namespace InstallersApi
 {
@@ -55,41 +56,34 @@ namespace InstallersApi
                 .AddEntityFrameworkStores<CentralDbContext>()
                 .AddDefaultTokenProviders();
 
-            services.AddScoped<IEmployeesRepository, ManagersRepository>();
-            services.AddScoped<IServiceProviderRepository, ServiceProviderRepository>();
+            services.AddScoped<IEmployeesRepository, EmployeesRepository>();
+            services.AddScoped<IServiceProvidersRepository, ServiceProviderRepository>();
             services.AddScoped<IAssignmentsRepository, AssignmentsRepository>();
             services.AddScoped<ICategoriesRepository, CategoriesRepository>();
             services.AddScoped<IServiceProviderPricingRepository, ServiceProviderPricingRepository>();
             services.AddScoped<IProductsRepository, ProductsRepository>();
 
-            services.AddScoped<IManagersService, ManagersService>();
-            services.AddScoped<IServiceProvidersService, ServiceProvidersService>();
+            services.AddScoped<IEmployeesService, EmployeesService>();
+            services.AddScoped<ISPService, ServiceProvidersService>();
             services.AddScoped<IAssignmentsService, AssignmentsService>();
             services.AddScoped<ICategoriesService, CategoriesService>();
             services.AddScoped<IServiceProviderPricingService, ServiceProviderPricingService>();
             services.AddScoped<IProductsService, ProductsService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IMarketersRepository, MarketersRepository>();
+            services.AddScoped<IMarketersService, MarketersService>();
+            services.AddScoped<IServiceProviderCategoryRepository, ServiceProviderCategoryRepository>();
 
             services.AddSingleton<WebSocketService>();
 
             services.AddScoped<ICompanyDataProvider, CompanyDataProvider>();
 
 
-            
-            /*services.AddScoped(provider =>
+
+            services.AddScoped(provider =>
             {
                 return new CompanyDbContext("Data Source=DESKTOP-9C5JK3S\\SQLEXPRESS;Initial Catalog=Shtibay;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
-            });*/
-
-
-/*            services.AddScoped(provider =>
-            {
-                var connectionStringProvider = provider.GetRequiredService<ICompanyDataProvider>();
-                var connectionStrings = connectionStringProvider.GetConnectionStrings();
-
-
-                return new CompanyDbContext(connectionString, connectionStringProvider);
-            });*/
+            });
 
         }
     }

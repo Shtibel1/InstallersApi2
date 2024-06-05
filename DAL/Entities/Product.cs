@@ -9,8 +9,8 @@ namespace DAL.Entities
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public double? CustomerInstallationPrice { get; set; }
         public int? Position { get; set; }
-        public double? CustomerAssignmentPrice { get; set; }
         public Guid CategoryId { get; set; }
         public Category Category { get; set; }
     }

@@ -10,7 +10,7 @@ namespace DAL.Entities
     public class ServiceProviderCategory
     {
         public Guid Id { get; set; }
-        public Guid ServiceProviderId { get; set; }
+        public Guid ServiceProviderIdExternal { get; set; }
         public Guid CategoryId { get; set; }
         public Category Category { get; set; }
     }

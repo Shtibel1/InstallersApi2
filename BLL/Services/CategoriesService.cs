@@ -21,34 +21,34 @@ namespace BLL.Services
             _mapper = mapper;
         }
 
-        public async Task<CategoryVm> CreateCategoryAsync(Category category)
+        public async Task<CategoryVm> CreateCategoryAsync(CategoryVm categoryVm)
         {
-            var newCat = await _categoriesRepository.CreateCategoryAsync(category);
-            return _mapper.Map<CategoryVm>(newCat);
+            var entity = await _categoriesRepository.CreateCategoryAsync(_mapper.Map<Category>(categoryVm));
+            var vm = _mapper.Map<CategoryVm>(entity);
+            return vm;
         }
 
         public async Task DeleteCategoryAsync(Guid id)
         {
-             await _categoriesRepository.DeleteCategoryAsync(id);
-        }
-
-        public async Task<List<CategoryVm>> GetCategoriesAsync()
-        {
-            var categories = await _categoriesRepository.GetCategoriesAsync();
-            return _mapper.Map<List<CategoryVm>>(categories);
+            await _categoriesRepository.DeleteCategoryAsync(id);
         }
 
         public async Task<CategoryVm> GetCategoryAsync(Guid id)
         {
-
-            var category = await _categoriesRepository.GetCategoryAsync(id);
-            return _mapper.Map<CategoryVm>(category);
+            var vm = _mapper.Map<CategoryVm>(await _categoriesRepository.GetCategoryAsync(id));
+            return vm;
         }
 
-        public async Task<CategoryVm> UpdateCategoryAsync(Guid id, Category category)
+        public async Task<List<CategoryVm>> GetCategoriesAsync()
         {
-            var updatedCat = await _categoriesRepository.UpdateCategoryAsync(id, category);
-            return _mapper.Map<CategoryVm>(updatedCat);
+            var vms = _mapper.Map<List<CategoryVm>>(await _categoriesRepository.GetCategoriesAsync());
+            return vms;
+        }
+
+        public async Task<CategoryVm> UpdateCategoryAsync(Guid id, CategoryVm categoryVm)
+        {
+            var entity = await _categoriesRepository.UpdateCategoryAsync(id, _mapper.Map<Category>(categoryVm));
+            return _mapper.Map<CategoryVm>(entity);
         }
     }
 }

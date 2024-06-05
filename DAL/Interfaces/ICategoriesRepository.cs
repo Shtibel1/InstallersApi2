@@ -13,7 +13,7 @@ namespace DAL.Repositories
         Task<Category> CreateCategoryAsync(Category category);
         Task<Category> UpdateCategoryAsync(Guid id, Category category);
         Task DeleteCategoryAsync(Guid id);
-
-        Task AddCategoriesToServiceProviderAsync(Guid serviceProviderId, List<Guid> categoryIds);
+        Task<Dictionary<Guid, List<Category>>> GetCategoriesByServiceProvidersAsync(List<Guid> serviceProviderIds);
+        Task<List<Category>> AddCategoriesToServiceProviderAsync(Guid serviceProviderId, List<Guid> categoryIds);
     }
 }
