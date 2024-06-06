@@ -16,6 +16,8 @@ namespace InstallersApi2.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class ProductsController : ControllerBase
     {
         private readonly ILogger<ProductsController> _logger;

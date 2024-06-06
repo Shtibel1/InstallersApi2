@@ -1,4 +1,5 @@
 ﻿using BLL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -7,6 +8,8 @@ namespace InstallersApi2.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class EmployeesController : ControllerBase
     {
         private readonly IEmployeesService _employeesService;

@@ -1,4 +1,5 @@
 ﻿using BLL.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Concurrent;
@@ -9,6 +10,8 @@ namespace InstallersApi2.Controllers
 {
     [Route("api/ws")]
     [ApiController]
+    [Authorize]
+
     public class WebSocketController : ControllerBase
     {
         private readonly WebSocketService _socketService;

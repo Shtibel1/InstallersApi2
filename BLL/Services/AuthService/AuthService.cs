@@ -172,7 +172,6 @@ namespace BLL.Services.AuthService
         {
             var authSigninKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]));
             var token = new JwtSecurityToken(
-                audience: _configuration["JWT:ValidAudiences"],
                 expires: DateTime.Now.AddDays(int.Parse(_configuration["JWT:TokenExpirationDays"])),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigninKey, SecurityAlgorithms.HmacSha256Signature)

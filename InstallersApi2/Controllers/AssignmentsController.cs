@@ -94,7 +94,7 @@ namespace InstallersApi2.Controllers
         }
 
         [HttpPost]
-        // [Authorize(Roles = Roles.Manager)]
+        [Authorize(Roles = nameof(Role.Employee))]
         public async Task<ActionResult<AssignmentVm>> PostAssignment(CreateAssignmentVm assignment)
         {
 
