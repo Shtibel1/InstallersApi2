@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="NewFolder\**" />
+    <Content Remove="NewFolder\**" />
+    <EmbeddedResource Remove="NewFolder\**" />
+    <None Remove="NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
 	  <PackageReference Include="AutoMapper" Version="12.0.1" />
 	  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.14" />
 	  <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.5" />
@@ -24,10 +31,5 @@
 	<ItemGroup>
 		<ProjectReference Include="..\BLL\BLL.csproj" />
 		<ProjectReference Include="..\DAL\DAL.csproj" />
-	</ItemGroup>
-
-
-	<ItemGroup>
-	  <Folder Include="NewFolder\" />
 	</ItemGroup>
 </Project>

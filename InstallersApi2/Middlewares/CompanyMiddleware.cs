@@ -19,9 +19,9 @@ namespace InstallersApi2.Middlewares
 
         public async Task InvokeAsync(HttpContext context, IServiceProvider serviceProvider)
         {
-            var token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
-            var business = GetCompaniesFromToken(token);
-
+            //var token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
+            //var business = GetCompaniesFromToken(token);
+            var business = new List<CompanyNames> { CompanyNames.Shtibay };
             var businessContext = serviceProvider.GetRequiredService<ICompanyDataProvider>();
             businessContext.SetCompanies(business);
 

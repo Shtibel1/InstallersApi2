@@ -14,13 +14,7 @@ namespace BLL.Interfaces
         Task<ProductVm> GetProductAsync(Guid id);
         Task<ProductVm> UpdateProductAsync(Guid id, ProductVm product);
         Task<ProductVm> CreateProductAsync(ProductVm product);
-        Task<SingleProductVm> GetProductWithPrices(Guid id, Guid installerId, Guid productId);
+        //Task<SingleProductVm> GetProductWithPrices(Guid id, Guid installerId, Guid productId);
         Task DeleteProductAsync(Guid id);
-    }
-
-    public class SingleProductVm
-    {
-        public ProductVm Product { get; set; }
-        public ServiceProviderPricingVm installerPricing { get; set; }
     }
 }

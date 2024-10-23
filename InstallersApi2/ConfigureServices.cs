@@ -20,6 +20,9 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using DAL.Providers;
 using DAL.Repositories.Assignments;
 using InstallersApi2.Controllers;
+using Microsoft.Extensions.DependencyInjection;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace InstallersApi
 {
@@ -60,23 +63,29 @@ namespace InstallersApi
             services.AddScoped<IServiceProvidersRepository, ServiceProviderRepository>();
             services.AddScoped<IAssignmentsRepository, AssignmentsRepository>();
             services.AddScoped<ICategoriesRepository, CategoriesRepository>();
-            services.AddScoped<IServiceProviderPricingRepository, ServiceProviderPricingRepository>();
             services.AddScoped<IProductsRepository, ProductsRepository>();
 
             services.AddScoped<IEmployeesService, EmployeesService>();
             services.AddScoped<ISPService, ServiceProvidersService>();
             services.AddScoped<IAssignmentsService, AssignmentsService>();
             services.AddScoped<ICategoriesService, CategoriesService>();
-            services.AddScoped<IServiceProviderPricingService, ServiceProviderPricingService>();
             services.AddScoped<IProductsService, ProductsService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IMarketersRepository, MarketersRepository>();
             services.AddScoped<IMarketersService, MarketersService>();
             services.AddScoped<IServiceProviderCategoryRepository, ServiceProviderCategoryRepository>();
-
+            services.AddScoped<IAdditionalsService, AdditionalsService>();
+            services.AddScoped<IAdditionalsRepository, AdditionalsRepository>();
+            services.AddScoped<IAdditionalPriceRepository, AdditionalPriceRepository>();
+            services.AddScoped<IAdditionalPriceService, AdditionalPriceService>();
             services.AddSingleton<WebSocketService>();
 
             services.AddScoped<ICompanyDataProvider, CompanyDataProvider>();
+
+            services.AddScoped<CompanyDbContext>(provider =>
+            {
+                return new CompanyDbContext("Data Source=WIN-RNVFCLAJBN7;Initial Catalog=Shtibay;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
+            });
 
         }
     }

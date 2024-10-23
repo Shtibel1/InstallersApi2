@@ -18,23 +18,19 @@ namespace DAL.Entities
         public double? CustomerAlreadyPaid { get; set; }
         public double Cost { get; set; }
         public double? Price { get; set; } //will be used to calaulate profits for the company
-        public AssignmentStatus Status { get; set; }
         public Guid ProductId { get; set; }
-        public Guid CustomerId { get; set; }
+        public Guid CustomerId { get; set; } = new Guid();
         public Guid EmployeeId { get; set; }
-        public Guid ServiceProviderId { get; set; }
+        public Guid ServiceProviderIdExt { get; set; }
         public Guid? MarketerId { get; set; }
         public Product Product { get; set; }
         public Customer Customer { get; set; }
-        public List<Comment>? Comments { get; set; } = new List<Comment>();
-        public PickupStatus? PickupStatus { get; set; }
         public Marketer? Marketer { get; set; }
 
+        public List<AssignmentAdditionalPrice> AssignmentAdditionalPrices { get; set; } = new List<AssignmentAdditionalPrice>();
+        public List<Comment>? Comments { get; set; } = new List<Comment>();
 
-        public double AssignmentPrice { get; set; }
-        public double? InnerFloorPrice { get; set; }
-        public double? OuterFloorPrice { get; set; }
-        public double? CarryPrice { get; set; }
-        public double? DistancePrice { get; set; }
+        public AssignmentStatus Status { get; set; }
+        public PickupStatus? PickupStatus { get; set; }
     }
 }

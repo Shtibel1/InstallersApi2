@@ -136,7 +136,10 @@ namespace BLL.Services.AuthService
 
         private async Task<AppUser> SaveUser(SignupModel signUp, Role role)
         {
-            var user = _mapper.Map<AppUser>(signUp);
+            var user = new AppUser
+            {
+                UserName = signUp.Name,
+            };
             var result = await _userManager.CreateAsync(user, signUp.Password);
             if (!result.Succeeded)
             {

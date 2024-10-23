@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DAL.Migrations
+namespace DAL.Migrations.CompanyDb
 {
     /// <inheritdoc />
     public partial class init : Migration
@@ -95,7 +95,7 @@ namespace DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    companyName = table.Column<int>(type: "int", nullable: false),
+                    CompanyName = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AssignmentDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CustomerNeedsToPay = table.Column<double>(type: "float", nullable: true),

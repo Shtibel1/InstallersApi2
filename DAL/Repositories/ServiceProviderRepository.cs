@@ -31,6 +31,7 @@ namespace DAL.Repositories
         public async Task<ServiceProvider> CreateServiceProviderAsync(ServiceProvider serviceProvider, CompanyNames companyName)
         {
             serviceProvider.Id = Guid.NewGuid();
+            serviceProvider.Role = Role.ServiceProvider.ToString();
             using var transaction = await _context.Database.BeginTransactionAsync();
 
             try

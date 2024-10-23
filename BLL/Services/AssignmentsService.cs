@@ -36,7 +36,7 @@ namespace BLL.Services
         public async Task<AssignmentVm> GetAssignmentAsync(Guid id, CompanyNames companyNames)
         {
             var assigment = await _assignmentsRepository.GetAssignmentAsync(id, companyNames);
-            var serviceProvider = await _serviceProvidersRepository.GetserviceProviderAsync(assigment.ServiceProviderId);
+            var serviceProvider = await _serviceProvidersRepository.GetserviceProviderAsync(assigment.ServiceProviderIdExt);
             var assignmentVm = _mapper.Map<AssignmentVm>(assigment);
             assignmentVm.ServiceProvider = _mapper.Map<ServiceProviderVm>(serviceProvider);
 
@@ -49,7 +49,7 @@ namespace BLL.Services
         public async Task<List<AssignmentVm>> GetAssignmentsAsync(string id, string role, AssignmentsFilters? filters)
         {
             var assEntities = await _assignmentsRepository.GetAssignmentsAsync(filters);
-            var serviceProvidersIds = assEntities.Select(a => a.ServiceProviderId).Distinct().ToList();
+            var serviceProvidersIds = assEntities.Select(a => a.ServiceProviderIdExt).Distinct().ToList();
             var serviceProviders = await _serviceProvidersRepository.GetServiceProvidersByIds(serviceProvidersIds);
 
             var assignmentsVms = _mapper.Map<List<AssignmentVm>>(assEntities);  
@@ -72,7 +72,7 @@ namespace BLL.Services
             return newAs;
         }
         public async Task<AssignmentVm> UpdateAssignmentAsync(Guid id, CreateAssignmentVm assignment, CompanyNames companyNames)
-        { 
+        {
             assignment.CompanyName = companyNames;
 
             var existingAssignment = await _assignmentsRepository.GetAssignmentAsync(id, companyNames);
@@ -83,22 +83,30 @@ namespace BLL.Services
 
             existingAssignment.CompanyName = companyNames;
             existingAssignment.CreatedDate = assignment.CreatedDate;
-            existingAssignment.AssignmentDate =null;
+            existingAssignment.AssignmentDate = null;
             existingAssignment.CustomerNeedsToPay = assignment.CustomerNeedsToPay;
             existingAssignment.CustomerAlreadyPaid = null;
             existingAssignment.Cost = assignment.Cost;
-            existingAssignment.Price =null;
-            existingAssignment.Status =  assignment.Status;
+            existingAssignment.Price = null;
+            existingAssignment.Status = assignment.Status;
             existingAssignment.ProductId = assignment.ProductId;
-            existingAssignment.Customer= _mapper.Map<Customer>(assignment.Customer);
+            existingAssignment.Customer = _mapper.Map<Customer>(assignment.Customer);
             existingAssignment.EmployeeId = assignment.EmployeeId;
-            existingAssignment.ServiceProviderId = assignment.ServiceProviderId;
+            existingAssignment.ServiceProviderIdExt = assignment.ServiceProviderId;
             existingAssignment.MarketerId = assignment.MarketerId;
-            existingAssignment.AssignmentPrice = assignment.AssignmentPrice;
-            existingAssignment.InnerFloorPrice = assignment.InnerFloorPrice;
-            existingAssignment.OuterFloorPrice = assignment.OuterFloorPrice;
-            existingAssignment.CarryPrice = assignment.CarryPrice;
-            existingAssignment.DistancePrice = assignment.DistancePrice;
+
+            // Handle many-to-many relationship
+            var additionalPrices = _mapper.Map<List<AdditionalPrice>>(assignment.Additionals);
+            existingAssignment.AssignmentAdditionalPrices.Clear(); // Clear existing relationships
+
+            foreach (var additionalPrice in additionalPrices)
+            {
+                existingAssignment.AssignmentAdditionalPrices.Add(new AssignmentAdditionalPrice
+                {
+                    AssignmentId = existingAssignment.Id,
+                    AdditionalPriceId = additionalPrice.Id
+                });
+            }
 
             await _assignmentsRepository.UpdateAssignmentAsync(id, existingAssignment);
             var updatedAs = await GetAssignmentAsync(id, companyNames);

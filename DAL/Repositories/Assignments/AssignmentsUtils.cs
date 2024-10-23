@@ -32,7 +32,7 @@ namespace DAL.Repositories.Assignments
 
             if (filters.ServiceProviderId != null)
             {
-                query = query.Where(a => a.ServiceProviderId == filters.ServiceProviderId);
+                query = query.Where(a => a.ServiceProviderIdExt == filters.ServiceProviderId);
             }
 
             return query;
