@@ -34,10 +34,10 @@ namespace BLL.Services
             await _additionalPriceRepository.DeleteAsync(id);
         }
 
-        public async Task<AdditionalPriceVm> Get(Guid SPId, Guid productId)
+        public async Task<List<AdditionalPriceVm>> Get(Guid SPId, Guid productId)
         {
             var additionalPrice = await _additionalPriceRepository.Get(SPId, productId);
-            return _mapper.Map<AdditionalPriceVm>(additionalPrice);
+            return _mapper.Map<List<AdditionalPriceVm>>(additionalPrice);
         }
 
         public async Task<List<AdditionalPriceVm>> GetBySP(Guid SPId)

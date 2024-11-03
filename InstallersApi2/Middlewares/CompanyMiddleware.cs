@@ -5,6 +5,7 @@ using DAL.Data;
 using DAL.Entities;
 using DAL.Enums;
 using DAL.Providers;
+using Microsoft.IdentityModel.Tokens;
 
 namespace InstallersApi2.Middlewares
 {
@@ -19,11 +20,13 @@ namespace InstallersApi2.Middlewares
 
         public async Task InvokeAsync(HttpContext context, IServiceProvider serviceProvider)
         {
-            //var token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
-            //var business = GetCompaniesFromToken(token);
-            var business = new List<CompanyNames> { CompanyNames.Shtibay };
-            var businessContext = serviceProvider.GetRequiredService<ICompanyDataProvider>();
-            businessContext.SetCompanies(business);
+            var token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
+            if (!token.IsNullOrEmpty())
+            {
+                var business = GetCompaniesFromToken(token);
+                var businessContext = serviceProvider.GetRequiredService<ICompanyDataProvider>();
+                businessContext.SetCompanies(business);
+            }
 
             await _next(context);
         }

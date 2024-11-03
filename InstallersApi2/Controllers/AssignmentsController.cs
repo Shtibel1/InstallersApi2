@@ -28,24 +28,24 @@ namespace InstallersApi2.Controllers
         public async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignments(AssignmentsFilters? filters)
         {
 
-            return await GetAssignmentsInternal(User.FindFirstValue(ClaimTypes.NameIdentifier), User.FindFirstValue(ClaimTypes.Role), filters);
+            return await GetAssignmentsInternal(Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)), User.FindFirstValue(ClaimTypes.Role), filters);
         }
 
         [HttpPost("filter")]
 
         public async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignmentsByInstaller(filtersVm filters)
         {
-            if (string.IsNullOrWhiteSpace(filters.InstallerId))
+            if (filters.InstallerId == null)
             {
                 return BadRequest("Invalid installer ID");
             }
 
             var user = User.FindAll(ClaimTypes.NameIdentifier);
 
-            return await GetAssignmentsInternal(filters.InstallerId, User.FindFirstValue(ClaimTypes.Role), null);
+            return await GetAssignmentsInternal(filters.InstallerId, User.FindFirstValue(ClaimTypes.Role), new AssignmentsFilters() { ServiceProviderId = filters.InstallerId});
         }
 
-        private async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignmentsInternal(string userId, string role, AssignmentsFilters? filters)
+        private async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignmentsInternal(Guid userId, string role, AssignmentsFilters? filters)
         {
 
             var assignmentsDto = await _assignmentService.GetAssignmentsAsync(userId, role, filters);
@@ -119,7 +119,7 @@ namespace InstallersApi2.Controllers
 
     public class filtersVm
     {
-        public string InstallerId { get; set; }
+        public Guid InstallerId { get; set; }
     }
 
 

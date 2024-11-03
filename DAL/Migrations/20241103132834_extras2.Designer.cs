@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace DAL.Migrations.CompanyDb
+namespace DAL.Migrations
 {
     [DbContext(typeof(CompanyDbContext))]
-    [Migration("20240806063650_init")]
-    partial class init
+    [Migration("20241103132834_extras2")]
+    partial class extras2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,6 +25,51 @@ namespace DAL.Migrations.CompanyDb
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("DAL.Entities.Additional", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Additionals");
+                });
+
+            modelBuilder.Entity("DAL.Entities.AdditionalPrice", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AdditionalId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ServiceProviderIdExt")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdditionalId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("AdditionalsPrices");
+                });
+
             modelBuilder.Entity("DAL.Entities.Assignment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -33,12 +78,6 @@ namespace DAL.Migrations.CompanyDb
 
                     b.Property<DateTime?>("AssignmentDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<double>("AssignmentPrice")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("CarryPrice")
-                        .HasColumnType("float");
 
                     b.Property<int>("CompanyName")
                         .HasColumnType("int");
@@ -58,20 +97,14 @@ namespace DAL.Migrations.CompanyDb
                     b.Property<double?>("CustomerNeedsToPay")
                         .HasColumnType("float");
 
-                    b.Property<double?>("DistancePrice")
-                        .HasColumnType("float");
-
                     b.Property<Guid>("EmployeeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<double?>("InnerFloorPrice")
+                    b.Property<double?>("Extras")
                         .HasColumnType("float");
 
                     b.Property<Guid?>("MarketerId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<double?>("OuterFloorPrice")
-                        .HasColumnType("float");
 
                     b.Property<int?>("PickupStatus")
                         .HasColumnType("int");
@@ -82,7 +115,7 @@ namespace DAL.Migrations.CompanyDb
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ServiceProviderId")
+                    b.Property<Guid>("ServiceProviderIdExt")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Status")
@@ -97,6 +130,21 @@ namespace DAL.Migrations.CompanyDb
                     b.HasIndex("ProductId");
 
                     b.ToTable("Assignments");
+                });
+
+            modelBuilder.Entity("DAL.Entities.AssignmentAdditionalPrice", b =>
+                {
+                    b.Property<Guid>("AssignmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AdditionalPriceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("AssignmentId", "AdditionalPriceId");
+
+                    b.HasIndex("AdditionalPriceId");
+
+                    b.ToTable("AssignmentAdditionalPrices");
                 });
 
             modelBuilder.Entity("DAL.Entities.Category", b =>
@@ -226,47 +274,23 @@ namespace DAL.Migrations.CompanyDb
                     b.ToTable("ServiceProviderCategories");
                 });
 
-            modelBuilder.Entity("DAL.Entities.ServiceProviderPricing", b =>
+            modelBuilder.Entity("DAL.Entities.AdditionalPrice", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.HasOne("DAL.Entities.Additional", "Additional")
+                        .WithMany()
+                        .HasForeignKey("AdditionalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<double?>("CarryPrice")
-                        .HasColumnType("float");
+                    b.HasOne("DAL.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Navigation("Additional");
 
-                    b.Property<double?>("DeliveryOnlyPrice")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("DistancePrice")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("InnerFloorPrice")
-                        .HasColumnType("float");
-
-                    b.Property<double>("InstallationPrice")
-                        .HasColumnType("float");
-
-                    b.Property<Guid>("InstallerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<double?>("OuterFloorPrice")
-                        .HasColumnType("float");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ServiceProviderIdExternal")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ServiceProviderPricing");
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("DAL.Entities.Assignment", b =>
@@ -292,6 +316,25 @@ namespace DAL.Migrations.CompanyDb
                     b.Navigation("Marketer");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("DAL.Entities.AssignmentAdditionalPrice", b =>
+                {
+                    b.HasOne("DAL.Entities.AdditionalPrice", "AdditionalPrice")
+                        .WithMany("AssignmentAdditionalPrices")
+                        .HasForeignKey("AdditionalPriceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DAL.Entities.Assignment", "Assignment")
+                        .WithMany("AssignmentAdditionalPrices")
+                        .HasForeignKey("AssignmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AdditionalPrice");
+
+                    b.Navigation("Assignment");
                 });
 
             modelBuilder.Entity("DAL.Entities.Comment", b =>
@@ -325,19 +368,15 @@ namespace DAL.Migrations.CompanyDb
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("DAL.Entities.ServiceProviderPricing", b =>
+            modelBuilder.Entity("DAL.Entities.AdditionalPrice", b =>
                 {
-                    b.HasOne("DAL.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
+                    b.Navigation("AssignmentAdditionalPrices");
                 });
 
             modelBuilder.Entity("DAL.Entities.Assignment", b =>
                 {
+                    b.Navigation("AssignmentAdditionalPrices");
+
                     b.Navigation("Comments");
                 });
 

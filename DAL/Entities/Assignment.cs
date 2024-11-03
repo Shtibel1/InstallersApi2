@@ -16,6 +16,7 @@ namespace DAL.Entities
         public DateTime? AssignmentDate { get; set; }
         public double? CustomerNeedsToPay { get; set; }
         public double? CustomerAlreadyPaid { get; set; }
+        public double? Extras { get; set; }
         public double Cost { get; set; }
         public double? Price { get; set; } //will be used to calaulate profits for the company
         public Guid ProductId { get; set; }

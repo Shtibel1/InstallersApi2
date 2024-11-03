@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BLL.Interfaces;
 using BLL.Models;
+using BLL.Vms;
 using DAL.Entities;
 using DAL.Enums;
 using DAL.Interfaces;
@@ -38,6 +39,9 @@ namespace BLL.Services
             var assigment = await _assignmentsRepository.GetAssignmentAsync(id, companyNames);
             var serviceProvider = await _serviceProvidersRepository.GetserviceProviderAsync(assigment.ServiceProviderIdExt);
             var assignmentVm = _mapper.Map<AssignmentVm>(assigment);
+
+            assignmentVm.AdditionalPrices = _mapper.Map<List<AdditionalPriceVm>>(assigment.AssignmentAdditionalPrices.Select(aap => aap.AdditionalPrice));
+
             assignmentVm.ServiceProvider = _mapper.Map<ServiceProviderVm>(serviceProvider);
 
             //var product = await _productsService.GetProductsByCategoryId(assigment.Product.CategoryId);
@@ -46,13 +50,23 @@ namespace BLL.Services
             return assignmentVm;
         }
 
-        public async Task<List<AssignmentVm>> GetAssignmentsAsync(string id, string role, AssignmentsFilters? filters)
+        public async Task<List<AssignmentVm>> GetAssignmentsAsync(Guid id, string role, AssignmentsFilters? filters)
         {
             var assEntities = await _assignmentsRepository.GetAssignmentsAsync(filters);
             var serviceProvidersIds = assEntities.Select(a => a.ServiceProviderIdExt).Distinct().ToList();
             var serviceProviders = await _serviceProvidersRepository.GetServiceProvidersByIds(serviceProvidersIds);
 
-            var assignmentsVms = _mapper.Map<List<AssignmentVm>>(assEntities);  
+
+
+            var assignmentsVms = _mapper.Map<List<AssignmentVm>>(assEntities);
+
+            for (int i = 0; i < assignmentsVms.Count; i++)
+            {
+                var addtionalPrices = assEntities[i].AssignmentAdditionalPrices.Select(aap => aap.AdditionalPrice).ToList();
+                var addtionalPricesVm = _mapper.Map<List<AdditionalPriceVm>>(addtionalPrices);
+                assignmentsVms[i].AdditionalPrices = addtionalPricesVm;
+            }
+            
             var serviceProvidersVm = _mapper.Map<List<ServiceProviderVm>>(serviceProviders);
 
             assignmentsVms.ForEach(a => a.ServiceProvider = serviceProvidersVm.FirstOrDefault(sp => sp.Id == a.ServiceProvider.Id));
@@ -63,7 +77,20 @@ namespace BLL.Services
         public async Task<AssignmentVm> CreateAssignmentAsync(CreateAssignmentVm assignment, CompanyNames companyName)
         {
             assignment.CompanyName = companyName;
+
+
             var entity = _mapper.Map<Assignment>(assignment);
+
+            assignment.AdditionalPrices.ForEach(price =>
+            {
+                entity.AssignmentAdditionalPrices.Add(new AssignmentAdditionalPrice
+                {
+                    Assignment = entity,
+                    AdditionalPriceId = price.Id
+                });
+            });
+
+            entity.ServiceProviderIdExt = assignment.ServiceProviderId;
 
             var createdAssignmentId = (await _assignmentsRepository.CreateAssignmentAsync(entity));
             var createdAssignment = await GetAssignmentAsync(createdAssignmentId, companyName);  
@@ -87,6 +114,7 @@ namespace BLL.Services
             existingAssignment.CustomerNeedsToPay = assignment.CustomerNeedsToPay;
             existingAssignment.CustomerAlreadyPaid = null;
             existingAssignment.Cost = assignment.Cost;
+            existingAssignment.Extras = assignment.Extras;
             existingAssignment.Price = null;
             existingAssignment.Status = assignment.Status;
             existingAssignment.ProductId = assignment.ProductId;
@@ -94,17 +122,18 @@ namespace BLL.Services
             existingAssignment.EmployeeId = assignment.EmployeeId;
             existingAssignment.ServiceProviderIdExt = assignment.ServiceProviderId;
             existingAssignment.MarketerId = assignment.MarketerId;
+            existingAssignment.Comments = _mapper.Map<List<Comment>>( assignment.Comments);
 
             // Handle many-to-many relationship
-            var additionalPrices = _mapper.Map<List<AdditionalPrice>>(assignment.Additionals);
+            var additionalPrices = _mapper.Map<List<AdditionalPrice>>(assignment.AdditionalPrices);
             existingAssignment.AssignmentAdditionalPrices.Clear(); // Clear existing relationships
 
             foreach (var additionalPrice in additionalPrices)
             {
                 existingAssignment.AssignmentAdditionalPrices.Add(new AssignmentAdditionalPrice
                 {
-                    AssignmentId = existingAssignment.Id,
-                    AdditionalPriceId = additionalPrice.Id
+                    AdditionalPriceId = additionalPrice.Id,
+                    AssignmentId = existingAssignment.Id
                 });
             }
 

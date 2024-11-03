@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DAL.Migrations.CompanyDb
+namespace DAL.Migrations
 {
     /// <inheritdoc />
     public partial class init : Migration
@@ -11,6 +11,18 @@ namespace DAL.Migrations.CompanyDb
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Additionals",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Additionals", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Categories",
                 columns: table => new
@@ -91,6 +103,34 @@ namespace DAL.Migrations.CompanyDb
                 });
 
             migrationBuilder.CreateTable(
+                name: "AdditionalsPrices",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Price = table.Column<double>(type: "float", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AdditionalId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ServiceProviderIdExt = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AdditionalsPrices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AdditionalsPrices_Additionals_AdditionalId",
+                        column: x => x.AdditionalId,
+                        principalTable: "Additionals",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AdditionalsPrices_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Assignments",
                 columns: table => new
                 {
@@ -102,18 +142,13 @@ namespace DAL.Migrations.CompanyDb
                     CustomerAlreadyPaid = table.Column<double>(type: "float", nullable: true),
                     Cost = table.Column<double>(type: "float", nullable: false),
                     Price = table.Column<double>(type: "float", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     EmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ServiceProviderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ServiceProviderIdExt = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     MarketerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    PickupStatus = table.Column<int>(type: "int", nullable: true),
-                    AssignmentPrice = table.Column<double>(type: "float", nullable: false),
-                    InnerFloorPrice = table.Column<double>(type: "float", nullable: true),
-                    OuterFloorPrice = table.Column<double>(type: "float", nullable: true),
-                    CarryPrice = table.Column<double>(type: "float", nullable: true),
-                    DistancePrice = table.Column<double>(type: "float", nullable: true)
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    PickupStatus = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -138,28 +173,25 @@ namespace DAL.Migrations.CompanyDb
                 });
 
             migrationBuilder.CreateTable(
-                name: "ServiceProviderPricing",
+                name: "AssignmentAdditionalPrices",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    InstallerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ServiceProviderIdExternal = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    InstallationPrice = table.Column<double>(type: "float", nullable: false),
-                    InnerFloorPrice = table.Column<double>(type: "float", nullable: true),
-                    OuterFloorPrice = table.Column<double>(type: "float", nullable: true),
-                    CarryPrice = table.Column<double>(type: "float", nullable: true),
-                    DistancePrice = table.Column<double>(type: "float", nullable: true),
-                    DeliveryOnlyPrice = table.Column<double>(type: "float", nullable: true)
+                    AssignmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AdditionalPriceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ServiceProviderPricing", x => x.Id);
+                    table.PrimaryKey("PK_AssignmentAdditionalPrices", x => new { x.AssignmentId, x.AdditionalPriceId });
                     table.ForeignKey(
-                        name: "FK_ServiceProviderPricing_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
+                        name: "FK_AssignmentAdditionalPrices_AdditionalsPrices_AdditionalPriceId",
+                        column: x => x.AdditionalPriceId,
+                        principalTable: "AdditionalsPrices",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AssignmentAdditionalPrices_Assignments_AssignmentId",
+                        column: x => x.AssignmentId,
+                        principalTable: "Assignments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -184,6 +216,21 @@ namespace DAL.Migrations.CompanyDb
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AdditionalsPrices_AdditionalId",
+                table: "AdditionalsPrices",
+                column: "AdditionalId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AdditionalsPrices_ProductId",
+                table: "AdditionalsPrices",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AssignmentAdditionalPrices_AdditionalPriceId",
+                table: "AssignmentAdditionalPrices",
+                column: "AdditionalPriceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Assignments_CustomerId",
@@ -214,16 +261,14 @@ namespace DAL.Migrations.CompanyDb
                 name: "IX_ServiceProviderCategories_CategoryId",
                 table: "ServiceProviderCategories",
                 column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ServiceProviderPricing_ProductId",
-                table: "ServiceProviderPricing",
-                column: "ProductId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AssignmentAdditionalPrices");
+
             migrationBuilder.DropTable(
                 name: "Comments");
 
@@ -231,10 +276,13 @@ namespace DAL.Migrations.CompanyDb
                 name: "ServiceProviderCategories");
 
             migrationBuilder.DropTable(
-                name: "ServiceProviderPricing");
+                name: "AdditionalsPrices");
 
             migrationBuilder.DropTable(
                 name: "Assignments");
+
+            migrationBuilder.DropTable(
+                name: "Additionals");
 
             migrationBuilder.DropTable(
                 name: "Customers");

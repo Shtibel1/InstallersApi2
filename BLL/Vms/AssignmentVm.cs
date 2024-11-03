@@ -1,5 +1,6 @@
 ﻿using BLL.DTOs;
 using BLL.Services;
+using BLL.Vms;
 using DAL.Entities;
 using DAL.Enums;
 using Newtonsoft.Json;
@@ -22,6 +23,8 @@ namespace BLL.Models
 
         [JsonProperty("cost")]
         public double Cost { get; set; }
+        [JsonProperty("extras")]
+        public double Extras { get; set; }
 
         [JsonProperty("price")]
         public double? Price { get; set; }
@@ -54,8 +57,9 @@ namespace BLL.Models
 
         [JsonProperty("marketer")]
         public MarketerVm Marketer { get; set; }
+        [JsonProperty("additionalPrices")]
+        public List<AdditionalPriceVm> AdditionalPrices { get; set; } = new List<AdditionalPriceVm>();
 
-        public List<AdditionalVm> Additionals { get; set; } = new List<AdditionalVm>();
     }
 
 }

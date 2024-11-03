@@ -8,9 +8,11 @@ namespace BLL.Models
 {
     public class CommentVm
     {
-        public Guid? Id { get; set; } = Guid.NewGuid();
+        public Guid? Id { get; set; }
         [JsonProperty("content")]
         public string Content { get; set; }
+        [JsonProperty("userId")]
+        public Guid UserId { get; set; }
 
     }
 }

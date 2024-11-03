@@ -10,7 +10,7 @@ namespace InstallersApi2.Controllers
 {
     [Route("api/ws")]
     [ApiController]
-    [Authorize]
+    
 
     public class WebSocketController : ControllerBase
     {

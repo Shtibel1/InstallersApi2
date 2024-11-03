@@ -13,7 +13,7 @@ namespace BLL.Interfaces
 {
     public interface IAssignmentsService
     {
-        Task<List<AssignmentVm>> GetAssignmentsAsync(string id, string role, AssignmentsFilters? filters);
+        Task<List<AssignmentVm>> GetAssignmentsAsync(Guid id, string role, AssignmentsFilters? filters);
         Task<AssignmentVm> GetAssignmentAsync(Guid id, CompanyNames companyNames);
         Task<AssignmentVm> CreateAssignmentAsync(CreateAssignmentVm assignment, CompanyNames companyNames);
         Task<AssignmentVm> UpdateAssignmentAsync(Guid id, CreateAssignmentVm assignment, CompanyNames companyName);

@@ -13,16 +13,21 @@ namespace DAL.Helpers
     {
         public MappingProfile()
         {
-            CreateMap<Comment, CommentVm>().ReverseMap();
+            CreateMap<Comment, CommentVm>()
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.WorkerId))
+                .ReverseMap();
             CreateMap<Customer, CustomerVm>().ReverseMap();
 
-            CreateMap<CreateAssignmentVm, Assignment>().ReverseMap();
+            CreateMap<CreateAssignmentVm, Assignment>()
+                .ForMember(dest => dest.ServiceProviderIdExt, opt => opt.MapFrom(src => src.ServiceProviderId));
 
             CreateMap<Assignment, AssignmentVm>()
                 .AfterMap((src, dest) =>
                 {
                     dest.ServiceProvider = new ServiceProviderVm() { Id = src.ServiceProviderIdExt };
                 });
+
+
 
             CreateMap<ServiceProvider, ServiceProviderVm>().ReverseMap();
             CreateMap<Category, CategoryVm>().ReverseMap();

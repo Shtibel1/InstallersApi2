@@ -41,11 +41,15 @@ namespace DAL.Repositories
         }
 
         // Get an AdditionalPrice by ServiceProviderId and ProductId
-        public async Task<AdditionalPrice> Get(Guid serviceProviderId, Guid productId)
+        public async Task<List<AdditionalPrice>> Get(Guid serviceProviderId, Guid productId)
         {
             var context = _companyDataProvider.GetContexts()[0];
             return await context.AdditionalsPrices
-                                .FirstOrDefaultAsync(ap => ap.ServiceProviderIdExt == serviceProviderId && ap.ProductId == productId);
+                                    .Include(ap =>ap.Additional)
+                                    .Where(ap => ap.ServiceProviderIdExt == serviceProviderId && ap.ProductId == productId && ap.Price > 0)
+                                    .GroupBy(ap => ap.AdditionalId) // Group by AdditionalId
+                                    .Select(g => g.OrderByDescending(ap => ap.CreatedDate).FirstOrDefault()) // Select the latest for each AdditionalId
+                                    .ToListAsync();
         }
 
         public async Task<List<AdditionalPrice>> GetBySP(Guid serviceProviderId)

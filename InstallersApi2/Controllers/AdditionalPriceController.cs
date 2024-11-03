@@ -35,7 +35,7 @@ namespace InstallersApi2.Controllers
 
         // GET: api/AdditionalPrice/{SPId}/{productId}
         [HttpGet("{SPId}/{productId}")]
-        public async Task<ActionResult<AdditionalPriceVm>> Get(Guid SPId, Guid productId)
+        public async Task<ActionResult<List<AdditionalPriceVm>>> Get(Guid SPId, Guid productId)
         {
             var additionalPrice = await _additionalPriceService.Get(SPId, productId);
             if (additionalPrice == null)

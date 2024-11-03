@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace DAL.Migrations
+namespace DAL.Migrations.CentralDb
 {
     [DbContext(typeof(CentralDbContext))]
     partial class CentralDbContextModelSnapshot : ModelSnapshot

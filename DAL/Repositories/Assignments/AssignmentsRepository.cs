@@ -28,6 +28,8 @@ namespace DAL.Repositories.Assignments
                 .Include(a => a.Customer)
                 .Include(a => a.Comments)
                 .Include(a => a.Marketer)
+                .Include(a => a.AssignmentAdditionalPrices)
+                .ThenInclude(aap => aap.AdditionalPrice)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             return assignments;
@@ -46,6 +48,9 @@ namespace DAL.Repositories.Assignments
                 .ThenInclude(p => p.Category)
                 .Include(a => a.Customer)
                 .Include(a => a.Comments)
+                .Include(a => a.AssignmentAdditionalPrices)
+                .ThenInclude(aap => aap.AdditionalPrice)
+                .ThenInclude(ap => ap.Additional)
                 .AsQueryable();
 
                 query = AssignmentsUtils.ApplyFilters(query, filters);
@@ -76,8 +81,15 @@ namespace DAL.Repositories.Assignments
         {
             var context = _companyDataProvider.GetContext(assignment.CompanyName);
 
-            context.Entry(assignment).State = EntityState.Detached;
-            context.Assignments.Update(assignment);
+            //context.Entry(assignment).State = EntityState.Detached;
+            //context.Assignments.Update(assignment);
+
+            /*assignment.AssignmentAdditionalPrices.ForEach(aap =>
+            {
+                context.AssignmentAdditionalPrices.Add(aap);
+
+            });*/
+
 
             await context.SaveChangesAsync();
 

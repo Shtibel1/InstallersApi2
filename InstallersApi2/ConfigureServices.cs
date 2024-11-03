@@ -82,11 +82,12 @@ namespace InstallersApi
 
             services.AddScoped<ICompanyDataProvider, CompanyDataProvider>();
 
-            services.AddScoped<CompanyDbContext>(provider =>
-            {
-                return new CompanyDbContext("Data Source=WIN-RNVFCLAJBN7;Initial Catalog=Shtibay;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
-            });
+            //services.AddScoped<CompanyDbContext>(provider =>
+            //{
+            //    return new CompanyDbContext("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Shtibay;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
+            //});
 
+            //services.AddDbContext<CompanyDbContext>();
         }
     }
 }

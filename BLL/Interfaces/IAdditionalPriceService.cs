@@ -10,7 +10,7 @@ namespace BLL.Interfaces
 {
     public interface IAdditionalPriceService
     {
-        Task<AdditionalPriceVm> Get(Guid SPId, Guid productId);
+        Task<List<AdditionalPriceVm>> Get(Guid SPId, Guid productId);
         Task<List<AdditionalPriceVm>> GetBySP(Guid SPId);
         Task<List<AdditionalPriceVm>> CreateAsync(List<AdditionalPriceVm> additionals);
         Task<List<AdditionalPriceVm>> UpdateAsync(List<AdditionalPriceVm> additional);

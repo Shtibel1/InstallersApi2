@@ -27,7 +27,9 @@ namespace BLL.Services.AuthService
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
         private readonly IEmployeesRepository _employeesRepository;
+        private readonly IServiceProvidersRepository _serviceProvidersRepo;
         private readonly ISPService _serviceProvidersService;
+
         private readonly ICategoriesRepository _categoriesRepository;
 
         public AuthService(
@@ -38,7 +40,8 @@ namespace BLL.Services.AuthService
            IMapper mapper,
            IEmployeesRepository employeesRepository,
            ISPService serviceProvidersService,
-           ICategoriesRepository categoriesRepository)
+           ICategoriesRepository categoriesRepository,
+           IServiceProvidersRepository serviceProvidersRepo)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -48,6 +51,7 @@ namespace BLL.Services.AuthService
             _employeesRepository = employeesRepository;
             _serviceProvidersService = serviceProvidersService;
             _categoriesRepository = categoriesRepository;
+            _serviceProvidersRepo = serviceProvidersRepo;
         }
 
         public async Task<AppUserVm?> LoginAsync(LoginModel login)
@@ -74,13 +78,14 @@ namespace BLL.Services.AuthService
                 case Role.Storekeeper:
                     var employee = await _employeesRepository.GetEmployeeByUserId(user.Id);
                     userId = employee.Id;
-                    companiesVm = employee.Companies.Select(c => _mapper.Map<CompanyVm>(c)).ToList();
+                    companiesVm = _mapper.Map<List<CompanyVm>>(employee.Companies);
                     token = GenerateToken(user, role, employee.Companies.Select(c => c.Name).ToList());
                     break;
                 case Role.ServiceProvider:
-                    var serviceProvider = await _serviceProvidersService.GetServiceProviderAsync(user.Id);
+                    var serviceProvider = await _serviceProvidersRepo.GetserviceProviderbyUserId(user.Id);
                     userId = serviceProvider.Id;
-                    token = GenerateToken(user, role, serviceProvider.CompanyNames.Select(n => n.ToString()).ToList());
+                    companiesVm = _mapper.Map<List<CompanyVm>>(serviceProvider.Companies);
+                    token = GenerateToken(user, role, serviceProvider.Companies.Select(n => n.Name).ToList());
                     break;
                 default:
                     return null;
@@ -115,8 +120,8 @@ namespace BLL.Services.AuthService
 
                 case Role.ServiceProvider:
                     var createServiceProvider = _mapper.Map<CreateServiceProviderVm>(signUp);
+                    createServiceProvider.IdentityId = identityId;
                     var createdServiceProvider = await _serviceProvidersService.CreateServiceProviderAsync(createServiceProvider);
-                    await _categoriesRepository.AddCategoriesToServiceProviderAsync(createdServiceProvider.Id, signUp.Categories);
                     return createdServiceProvider;
 
                 default:

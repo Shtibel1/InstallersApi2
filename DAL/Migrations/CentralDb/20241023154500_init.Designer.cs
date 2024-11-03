@@ -9,10 +9,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace DAL.Migrations
+namespace DAL.Migrations.CentralDb
 {
     [DbContext(typeof(CentralDbContext))]
-    [Migration("20240806061537_init")]
+    [Migration("20241023154500_init")]
     partial class init
     {
         /// <inheritdoc />

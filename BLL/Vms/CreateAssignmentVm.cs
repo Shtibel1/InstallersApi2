@@ -1,4 +1,5 @@
 ﻿using BLL.DTOs;
+using BLL.Vms;
 using DAL.Enums;
 using Newtonsoft.Json;
 using System;
@@ -14,12 +15,14 @@ namespace BLL.Models
         [JsonProperty("id")]
         public Guid? Id { get; set; } = Guid.NewGuid();
 
-        [JsonProperty("date")]
+        [JsonProperty("createdDate")]
         public DateTime CreatedDate { get; set; }
         [JsonProperty("customerNeedsToPay")]
         public double? CustomerNeedsToPay { get; set; }
         [JsonProperty("cost")]
-        public double Cost { get; set; }        
+        public double Cost { get; set; } 
+        [JsonProperty("extras")]
+        public double Extras { get; set; }        
 
         [JsonProperty("serviceProviderId")]
         public Guid ServiceProviderId { get; set; }
@@ -37,8 +40,8 @@ namespace BLL.Models
         public CompanyNames? CompanyName { get; set; }
 
         public Guid MarketerId { get; set; }
-
-        public List<AdditionalVm> Additionals { get; set; } = new List<AdditionalVm>();
+        [JsonProperty("additionalPrices")]
+        public List<AdditionalPriceVm> AdditionalPrices { get; set; } = new List<AdditionalPriceVm>();
     }
 
 }
