@@ -41,15 +41,7 @@ namespace InstallersApi
 
 
             services.AddDbContext<CentralDbContext>(options =>
-    options.UseSqlServer(
-        configuration.GetConnectionString("Default"),
-        sqlServerOptions => sqlServerOptions.EnableRetryOnFailure(
-            maxRetryCount: 5, // Number of retry attempts
-            maxRetryDelay: TimeSpan.FromSeconds(30), // Delay between retries
-            errorNumbersToAdd: null // Specify additional SQL error numbers to retry on (optional)
-        )
-    )
-);
+            options.UseSqlServer(configuration.GetConnectionString("Default")));
 
             services.AddHttpClient();
 
