@@ -32,11 +32,13 @@ namespace BLL.Models
         public Guid ProductId { get; set; }
         [JsonProperty("status")]
         public AssignmentStatus Status { get; set; } = AssignmentStatus.New;
+        [JsonProperty("pickupStatus")]
+        public PickupStatus PickupStatus { get; set; } = PickupStatus.NotReady;
         [JsonProperty("customer")]
         public CustomerVm Customer { get; set; }
         [JsonProperty("comments")]
         public List<CommentVm>? Comments { get; set; }
-        [JsonProperty("pickupStatus")]
+        [JsonProperty("companyName")]
         public CompanyNames? CompanyName { get; set; }
 
         public Guid MarketerId { get; set; }

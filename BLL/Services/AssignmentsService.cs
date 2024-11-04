@@ -123,6 +123,7 @@ namespace BLL.Services
             existingAssignment.ServiceProviderIdExt = assignment.ServiceProviderId;
             existingAssignment.MarketerId = assignment.MarketerId;
             existingAssignment.Comments = _mapper.Map<List<Comment>>( assignment.Comments);
+            existingAssignment.PickupStatus = assignment.PickupStatus;
 
             // Handle many-to-many relationship
             var additionalPrices = _mapper.Map<List<AdditionalPrice>>(assignment.AdditionalPrices);
