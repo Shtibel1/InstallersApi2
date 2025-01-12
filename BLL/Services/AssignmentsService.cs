@@ -110,7 +110,7 @@ namespace BLL.Services
 
             existingAssignment.CompanyName = companyNames;
             existingAssignment.CreatedDate = assignment.CreatedDate;
-            existingAssignment.AssignmentDate = null;
+            existingAssignment.AssignmentDate = assignment.AssignmentDate;
             existingAssignment.CustomerNeedsToPay = assignment.CustomerNeedsToPay;
             existingAssignment.CustomerAlreadyPaid = null;
             existingAssignment.Cost = assignment.Cost;

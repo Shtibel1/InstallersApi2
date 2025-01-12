@@ -30,6 +30,7 @@ namespace DAL.Repositories.Assignments
                 .Include(a => a.Marketer)
                 .Include(a => a.AssignmentAdditionalPrices)
                 .ThenInclude(aap => aap.AdditionalPrice)
+                .ThenInclude(ap => ap.Additional)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             return assignments;

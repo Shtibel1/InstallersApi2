@@ -27,6 +27,7 @@ namespace DAL.Entities
         public Product Product { get; set; }
         public Customer Customer { get; set; }
         public Marketer? Marketer { get; set; }
+        public bool? IsPaid { get; set; }
 
         public List<AssignmentAdditionalPrice> AssignmentAdditionalPrices { get; set; } = new List<AssignmentAdditionalPrice>();
         public List<Comment>? Comments { get; set; } = new List<Comment>();

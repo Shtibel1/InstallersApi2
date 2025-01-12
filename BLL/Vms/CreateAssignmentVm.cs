@@ -17,6 +17,8 @@ namespace BLL.Models
 
         [JsonProperty("createdDate")]
         public DateTime CreatedDate { get; set; }
+        [JsonProperty("assignmentDate")]
+        public DateTime? AssignmentDate { get; set; }
         [JsonProperty("customerNeedsToPay")]
         public double? CustomerNeedsToPay { get; set; }
         [JsonProperty("cost")]

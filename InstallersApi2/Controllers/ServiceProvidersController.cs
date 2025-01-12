@@ -17,7 +17,7 @@ using DAL.Providers;
 
 namespace ServiceProvidersApi2.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ServiceProvidersController : ControllerBase

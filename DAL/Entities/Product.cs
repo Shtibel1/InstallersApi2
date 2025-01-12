@@ -13,5 +13,6 @@ namespace DAL.Entities
         public int? Position { get; set; }
         public Guid CategoryId { get; set; }
         public Category Category { get; set; }
+        public int? Order { get; set; }
     }
 }

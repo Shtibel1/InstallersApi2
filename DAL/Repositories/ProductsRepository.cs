@@ -28,7 +28,9 @@ namespace DAL.Repositories
         {
             var context = _companyDataProvider.GetContexts()[0];
 
-            return await context.Products.Include(p => p.Category).ToListAsync();
+            return await context.Products.Include(p => p.Category)
+                .OrderBy(prd => prd.Order == null)
+                .ThenBy(prd => prd.Order).ToListAsync();
         }
 
         public async Task<Product> CreateProductAsync(Product product) 

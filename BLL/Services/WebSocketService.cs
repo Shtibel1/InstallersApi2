@@ -1,5 +1,6 @@
 ﻿using BLL.Models;
 using DAL.Entities;
+using DAL.Enums;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
@@ -17,7 +18,7 @@ namespace BLL.Services
 {
     public class WebSocketService
     {
-        private readonly ConcurrentDictionary<string, WebSocket> _sockets = new ConcurrentDictionary<string, WebSocket>();
+        private readonly ConcurrentDictionary<CompanyNames, List<SocketUser>> _sockets = new ConcurrentDictionary<CompanyNames, List<SocketUser>>();
 
         private Timer _timer;
 
@@ -26,18 +27,37 @@ namespace BLL.Services
 
         }
 
-        public string AddSocket(WebSocket socket)
+        public Guid AddSocket(WebSocket socket, List<CompanyNames> companyNames)
         {
-            var connId = Guid.NewGuid().ToString();
-            _sockets.TryAdd(connId, socket);
+            var connId = Guid.NewGuid();
+            var user = new SocketUser
+            {
+                Id = connId,
+                Socket = socket,
+                Companies = companyNames
+            };
+
+            foreach (var company in companyNames)
+            {
+                if (_sockets.TryGetValue(company, out var list))
+                {
+                    list.Add(user);
+                }
+                else
+                {
+                    _sockets.TryAdd(company, new List<SocketUser> { user });
+                }
+            }
+
             return connId;
         }
 
-        public async Task ListenToSocket(string connId, WebSocket socket)
+        public async Task ListenToSocket(Guid connId, WebSocket socket, List<CompanyNames> companies)
         {
             var buffer = new byte[1024 * 4];
             try
             {
+
                 while (socket.State == WebSocketState.Open)
                 {
                     var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
@@ -52,7 +72,7 @@ namespace BLL.Services
                         else
                         {
                             var assignment = JsonConvert.DeserializeObject<AssignmentVm>(message);
-                            await SendMessageToAllAsync(connId,assignment);
+                            await SendMessageToAllAsync(connId, assignment, assignment.CompanyName);
                         }
                     }
                     else if (result.MessageType == WebSocketMessageType.Close)
@@ -68,24 +88,40 @@ namespace BLL.Services
             }
         }
 
-        public async Task RemoveSocketAsync(string id)
+        public async Task RemoveSocketAsync(Guid id)
         {
-            if (_sockets.TryRemove(id, out WebSocket socket))
+            foreach (var companyId in _sockets.Keys.ToList())
             {
-                await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by WebSocketService", CancellationToken.None);
-                socket.Dispose();
+                var usersList = _sockets[companyId];
+                var user = usersList.FirstOrDefault(u => u.Id == id);
+                if (user != null)
+                {
+                    await user.Socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by WebSocketService", CancellationToken.None);
+                    user.Socket.Dispose();
+                    usersList.Remove(user); // Remove from the specific company list
+                }
+
+                // If no users are left for the company, remove the company entry
+                if (!_sockets[companyId].Any())
+                {
+                    _sockets.TryRemove(companyId, out _);
+                }
             }
         }
 
-        public async Task SendMessageToAllAsync(string connId, AssignmentVm assignment)
+        public async Task SendMessageToAllAsync(Guid connId, AssignmentVm assignment, CompanyNames companyName)
         {
-            foreach (var pair in _sockets)
+            if (_sockets.TryGetValue(companyName, out var usersList))
             {
-                if (pair.Key == connId) continue;
-
-                if (pair.Value.State == WebSocketState.Open)
+                foreach (var pair in usersList)
                 {
-                    await SendAsync(pair.Value, assignment);
+                    // Don't send the message to the same user
+                    if (pair.Id == connId) continue;
+
+                    if (pair.Socket.State == WebSocketState.Open)
+                    {
+                        await SendAsync(pair.Socket, assignment);
+                    }
                 }
             }
         }
@@ -98,9 +134,10 @@ namespace BLL.Services
 
     }
 
-    public class SocketMessage
+    public class SocketUser
     {
-        public string Type { get; set; }
-        public AssignmentVm Payload { get; set; }
+        public Guid Id { get; set; }
+        public WebSocket Socket { get; set; }
+        public List<CompanyNames> Companies { get; set; } = new List<CompanyNames>();
     }
 }

@@ -25,6 +25,7 @@ namespace DAL.Repositories
             return await context.Additionals.ToListAsync();
         }
 
+
         public async Task<Additional?> UpdateAsync(Additional additional)
         {
             var context = _companyDataProvider.GetContexts()[0];

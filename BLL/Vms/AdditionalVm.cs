@@ -9,7 +9,9 @@ namespace BLL.DTOs
 {
     public class AdditionalVm
     {
+        [JsonProperty("id")]
         public Guid Id { get; set; }
+        [JsonProperty("name")]
         public string Name { get; set; }
     }
 }

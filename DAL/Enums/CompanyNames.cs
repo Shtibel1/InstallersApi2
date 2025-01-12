@@ -9,6 +9,7 @@ namespace DAL.Enums
     public enum CompanyNames
     {
         Shtibay,
+        Mygan,
         Unkown,
     }
 }

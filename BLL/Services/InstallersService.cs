@@ -67,8 +67,8 @@ namespace BLL.Services
                 {
                     
                     serviceProviderVm.Categories = _mapper.Map<List<CategoryVm>>(serviceProviderCategories[serviceProvider.Id]);
-                    vms.Add(serviceProviderVm);
                 }
+                    vms.Add(serviceProviderVm);
 
             }
 
@@ -79,7 +79,10 @@ namespace BLL.Services
         public async Task<ServiceProviderVm> GetServiceProviderAsync(Guid id)
         {
             var entity = await _accountRepository.GetserviceProviderAsync(id);
-            return _mapper.Map<ServiceProviderVm>(entity);
+            var serviceProviderCategories = await _categoriesRepository.GetCategoriesByServiceProvidersAsync(new List<Guid> { id });
+            var vm =  _mapper.Map<ServiceProviderVm>(entity);
+            vm.Categories = _mapper.Map<List<CategoryVm>>(serviceProviderCategories[id]);
+            return vm;
         }
     }
 }
