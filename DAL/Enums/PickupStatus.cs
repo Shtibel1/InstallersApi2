@@ -10,6 +10,7 @@ namespace DAL.Enums
     {
         NotReady,
         Ready,
-        taken
+        taken,
+        Returned
     }
 }

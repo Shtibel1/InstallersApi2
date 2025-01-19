@@ -10,6 +10,7 @@ namespace DAL.Enums
     {
         New,
         Scheduled,
-        Done
+        Done,
+        Canceled
     }
 }

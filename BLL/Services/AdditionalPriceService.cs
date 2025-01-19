@@ -37,6 +37,7 @@ namespace BLL.Services
         public async Task<List<AdditionalPriceVm>> Get(Guid SPId, Guid productId)
         {
             var additionalPrice = await _additionalPriceRepository.Get(SPId, productId);
+            additionalPrice = additionalPrice.Where(ap => ap.Price > 0).ToList();
             return _mapper.Map<List<AdditionalPriceVm>>(additionalPrice);
         }
 

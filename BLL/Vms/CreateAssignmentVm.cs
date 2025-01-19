@@ -46,6 +46,9 @@ namespace BLL.Models
         public Guid MarketerId { get; set; }
         [JsonProperty("additionalPrices")]
         public List<AdditionalPriceVm> AdditionalPrices { get; set; } = new List<AdditionalPriceVm>();
+
+        [JsonProperty("numOfProducts")]
+        public int? NumOfProducts { get; set; }
     }
 
 }

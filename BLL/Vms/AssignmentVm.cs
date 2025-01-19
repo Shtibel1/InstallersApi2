@@ -33,6 +33,8 @@ namespace BLL.Models
         public AssignmentStatus Status { get; set; }
         [JsonProperty("isPaid")]
         public bool? IsPaid { get; set; }
+        [JsonProperty("numOfProducts")]
+        public int? NumOfProducts { get; set; }
 
         [JsonProperty("product")]
         public ProductVm Product { get; set; }

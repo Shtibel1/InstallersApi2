@@ -19,6 +19,7 @@ namespace DAL.Entities
         public double? Extras { get; set; }
         public double Cost { get; set; }
         public double? Price { get; set; } //will be used to calaulate profits for the company
+        public int? NumOfProducts { get; set; }
         public Guid ProductId { get; set; }
         public Guid CustomerId { get; set; } = new Guid();
         public Guid EmployeeId { get; set; }

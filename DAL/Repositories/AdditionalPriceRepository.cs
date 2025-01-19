@@ -46,7 +46,7 @@ namespace DAL.Repositories
             var context = _companyDataProvider.GetContexts()[0];
             return await context.AdditionalsPrices
                                     .Include(ap =>ap.Additional)
-                                    .Where(ap => ap.ServiceProviderIdExt == serviceProviderId && ap.ProductId == productId && ap.Price > 0)
+                                    .Where(ap => ap.ServiceProviderIdExt == serviceProviderId && ap.ProductId == productId)
                                     .GroupBy(ap => ap.AdditionalId) // Group by AdditionalId
                                     .Select(g => g.OrderByDescending(ap => ap.CreatedDate).FirstOrDefault()) // Select the latest for each AdditionalId
                                     .ToListAsync();
