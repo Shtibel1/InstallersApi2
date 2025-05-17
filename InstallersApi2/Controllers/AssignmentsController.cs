@@ -25,7 +25,7 @@ namespace InstallersApi2.Controllers
             _companyDataProvider = companyDataProvider;
         }
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignments(AssignmentsFilters? filters)
+        public async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignments([FromQuery]AssignmentsFilters? filters)
         {
 
             return await GetAssignmentsInternal(Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)), User.FindFirstValue(ClaimTypes.Role), filters);
@@ -112,6 +112,21 @@ namespace InstallersApi2.Controllers
             await _assignmentService.DeleteAssignmentAsync(id, _companyDataProvider.GetCompanies()[0]);
             return NoContent();
 
+        }
+
+        [HttpGet("script")]
+        public async Task<IActionResult> GetScript()
+        {
+            using var client = new HttpClient();
+
+            var response = await client.GetAsync("https://copilot.microsoft.com/webchat/bootstrapper.js");
+
+            if (!response.IsSuccessStatusCode)
+                return StatusCode((int)response.StatusCode);
+
+            var script = await response.Content.ReadAsStringAsync();
+
+            return Content(script, "application/javascript");
         }
 
 

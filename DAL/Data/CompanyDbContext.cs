@@ -1,5 +1,6 @@
 ﻿using DAL.Entities;
 using DAL.Providers;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Data
@@ -33,6 +34,7 @@ namespace DAL.Data
         public DbSet<ServiceProviderCategory> ServiceProviderCategories { get; set; }
         public DbSet<Marketer> Marketers { get; set; }
         public DbSet<AssignmentAdditionalPrice> AssignmentAdditionalPrices { get; set; }
+        public DbSet<Calculation> Calculation { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -51,6 +53,19 @@ namespace DAL.Data
                 .WithMany(ap => ap.AssignmentAdditionalPrices)
                 .HasForeignKey(ap => ap.AdditionalPriceId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CalculationAssignment>()
+       .HasKey(ca => new { ca.CalculationId, ca.AssignmentId });
+
+            modelBuilder.Entity<CalculationAssignment>()
+                .HasOne(ca => ca.Calculation)
+                .WithMany(c => c.CalculationAssignments)
+                .HasForeignKey(ca => ca.CalculationId);
+
+            modelBuilder.Entity<CalculationAssignment>()
+                .HasOne(ca => ca.Assignment)
+                .WithMany(a => a.CalculationAssignments)
+                .HasForeignKey(ca => ca.AssignmentId);
 
             base.OnModelCreating(modelBuilder);
 

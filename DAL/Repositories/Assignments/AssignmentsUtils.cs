@@ -35,6 +35,21 @@ namespace DAL.Repositories.Assignments
                 query = query.Where(a => a.ServiceProviderIdExt == filters.ServiceProviderId);
             }
 
+            if (filters.IsPaid != null)
+            {
+                if (filters.IsPaid == true)
+                    query = query.Where(a => a.IsPaid == filters.IsPaid);
+                if (filters.IsPaid == false)
+                {
+                    query = query.Where(a => a.IsPaid == filters.IsPaid || a.IsPaid == null);
+                }
+            }
+
+            if (filters.CustomerName != null)
+            {
+                query = query.Where(a => a.Customer.Name.Contains( filters.CustomerName));
+            }
+
             return query;
         }
     }

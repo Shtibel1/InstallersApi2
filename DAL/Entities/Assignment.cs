@@ -33,6 +33,8 @@ namespace DAL.Entities
         public List<AssignmentAdditionalPrice> AssignmentAdditionalPrices { get; set; } = new List<AssignmentAdditionalPrice>();
         public List<Comment>? Comments { get; set; } = new List<Comment>();
 
+        public List<CalculationAssignment> CalculationAssignments { get; set; }
+
         public AssignmentStatus Status { get; set; }
         public PickupStatus? PickupStatus { get; set; }
     }

@@ -78,6 +78,8 @@ namespace InstallersApi
             services.AddScoped<IAdditionalsRepository, AdditionalsRepository>();
             services.AddScoped<IAdditionalPriceRepository, AdditionalPriceRepository>();
             services.AddScoped<IAdditionalPriceService, AdditionalPriceService>();
+            services.AddScoped<ICalaulationsRepository, CalaulationsRepository>();
+            services.AddScoped<ICalaulationsService, CalaulationsServics>();
             services.AddSingleton<WebSocketService>();
 
             services.AddScoped<ICompanyDataProvider, CompanyDataProvider>();

@@ -2,6 +2,7 @@
 using DAL.Entities;
 using DAL.Enums;
 using DAL.Providers;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
 
@@ -52,6 +53,7 @@ namespace DAL.Repositories.Assignments
                 .Include(a => a.AssignmentAdditionalPrices)
                 .ThenInclude(aap => aap.AdditionalPrice)
                 .ThenInclude(ap => ap.Additional)
+                .Take(500)
                 .AsQueryable();
 
                 query = AssignmentsUtils.ApplyFilters(query, filters);
@@ -125,6 +127,9 @@ namespace DAL.Repositories.Assignments
         public DateTime? EndDate { get; set; }
         public Guid? ManagerId { get; set; }
         public Guid? ServiceProviderId { get; set; }
+        public bool? IsPaid { get; set; }
+        public string? CustomerName { get; set; }
+
 
     }
 }

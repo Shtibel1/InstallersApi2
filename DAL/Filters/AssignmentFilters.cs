@@ -9,5 +9,6 @@ namespace DAL.Filters
     public class AssignmentFilters
     {
         public string Status { get; set; }
+        public bool IsPaid { get; set; }
     }
 }
