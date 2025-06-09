@@ -53,10 +53,10 @@ namespace DAL.Repositories.Assignments
                 .Include(a => a.AssignmentAdditionalPrices)
                 .ThenInclude(aap => aap.AdditionalPrice)
                 .ThenInclude(ap => ap.Additional)
-                .Take(500)
+                
                 .AsQueryable();
 
-                query = AssignmentsUtils.ApplyFilters(query, filters);
+                query = AssignmentsUtils.ApplyFilters(query, filters).Take(500);
                 tasks.Add(query.ToListAsync());
             }
 
