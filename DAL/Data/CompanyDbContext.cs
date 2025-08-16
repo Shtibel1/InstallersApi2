@@ -35,6 +35,10 @@ namespace DAL.Data
         public DbSet<Marketer> Marketers { get; set; }
         public DbSet<AssignmentAdditionalPrice> AssignmentAdditionalPrices { get; set; }
         public DbSet<Calculation> Calculation { get; set; }
+        public DbSet<ServiceProduct> ServiceProducts { get; set; }
+        public DbSet<ProductRequiredServiceProduct> ProductRequiredServiceProducts { get; set; }
+        public DbSet<ServiceProviderStock> ServiceProviderStock { get; set; }
+        public DbSet<ServiceProviderStockAudit> ServiceProviderStockAudit { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -68,6 +72,15 @@ namespace DAL.Data
                 .HasForeignKey(ca => ca.AssignmentId);
 
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ProductRequiredServiceProduct>(e =>
+            {
+                e.ToTable("ProductRequiredServiceProducts");
+                e.HasKey(x => new { x.ProductId, x.ServiceProductId });
+                e.Property(x => x.Quantity).HasDefaultValue(1);
+
+                e.HasIndex(x => x.ServiceProductId).HasDatabaseName("IX_PRSP_ServiceProductId");
+            });
 
         }
     }

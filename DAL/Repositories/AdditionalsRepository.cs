@@ -22,7 +22,7 @@ namespace DAL.Repositories
         {
             var context = _companyDataProvider.GetContexts()[0];
 
-            return await context.Additionals.ToListAsync();
+            return await context.Additionals.OrderBy(a => a.Order).ToListAsync();
         }
 
 

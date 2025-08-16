@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace DAL.Entities
 {
-    public class Additional
+    public class ServiceProduct
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public int Order { get; set; }
-
     }
 }

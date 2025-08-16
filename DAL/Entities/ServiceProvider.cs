@@ -11,6 +11,5 @@ namespace DAL.Abstracts
         public Guid IdentityId { get; set; }
 
         public List<Company> Companies { get; set; } = new List<Company>();
-
     }
 }

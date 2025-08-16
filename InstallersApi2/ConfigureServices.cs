@@ -80,16 +80,18 @@ namespace InstallersApi
             services.AddScoped<IAdditionalPriceService, AdditionalPriceService>();
             services.AddScoped<ICalaulationsRepository, CalaulationsRepository>();
             services.AddScoped<ICalaulationsService, CalaulationsServics>();
+            services.AddScoped<IServiceProductsRepository, ServiceProductsRepository>();
+            services.AddScoped<IServiceProductsService, ServiceProductsService>();
             services.AddSingleton<WebSocketService>();
 
             services.AddScoped<ICompanyDataProvider, CompanyDataProvider>();
 
-            //services.AddScoped<CompanyDbContext>(provider =>
-            //{
-            //    return new CompanyDbContext("Data Source=faults.c6v1xirlb8ux.eu-west-1.rds.amazonaws.com;Initial Catalog=Shtibay;User ID=admin;Password=Nads9Nads9; Encrypt=False; TrustServerCertificate=False");
-            //});
+            services.AddScoped<CompanyDbContext>(provider =>
+            {
+                return new CompanyDbContext("Data Source=faults.c6v1xirlb8ux.eu-west-1.rds.amazonaws.com;Initial Catalog=Shtibay;User ID=admin;Password=Nads9Nads9; Encrypt=False; TrustServerCertificate=False");
+            });
 
-            //services.AddDbContext<CompanyDbContext>();
+            services.AddDbContext<CompanyDbContext>();
         }
     }
 }

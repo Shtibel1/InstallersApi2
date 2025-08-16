@@ -45,7 +45,11 @@ namespace DAL.Helpers
             CreateMap<AdditionalPriceVm, AdditionalPrice>().ReverseMap();
 
             CreateMap<CalaulationVm, Calculation>().ReverseMap();
-            
+
+            CreateMap<ServiceProductVm, ServiceProduct>().ReverseMap();
+            CreateMap<ServiceProviderStockVm, ServiceProviderStock>().ReverseMap();
+            CreateMap<ServiceProviderStockAuditVm, ServiceProviderStockAudit>().ReverseMap();
+
         }
     }
 }
