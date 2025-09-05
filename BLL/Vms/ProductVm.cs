@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using DAL.Entities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,5 +21,11 @@ namespace BLL.Models
         public Guid CategoryId { get; set; }
         [JsonProperty("category")]
         public CategoryVm? Category { get; set; }
+        [JsonProperty("order")]
+        public int? Order { get; set; }
+        [JsonProperty("requiredServiceProducts")]
+        public List<ProductRequiredServiceProduct>? RequiredServiceProducts { get; set; }
+
+
     }
 }

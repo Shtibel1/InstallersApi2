@@ -14,6 +14,6 @@ namespace DAL.Entities
         public Guid CategoryId { get; set; }
         public Category Category { get; set; }
         public int? Order { get; set; }
-        public List<ProductRequiredServiceProduct> RequiredServiceProducts { get; set; }
+        public List<ProductRequiredServiceProduct>? RequiredServiceProducts { get; set; }
     }
 }
