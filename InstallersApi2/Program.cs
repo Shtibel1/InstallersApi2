@@ -49,6 +49,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseHttpsRedirection();
 }
 
 app.UseRouting();
@@ -58,7 +59,6 @@ app.UseAuthorization();
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseMiddleware<CompanyMiddleware>();
 app.UseWebSockets();
-app.UseHttpsRedirection();
 
 app.MapControllers();
 
