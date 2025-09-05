@@ -54,14 +54,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseRouting();
 app.UseCors("corsapp");
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseMiddleware<CompanyMiddleware>();
 app.UseWebSockets();
 app.UseHttpsRedirection();
-app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.MapControllers();
 
