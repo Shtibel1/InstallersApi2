@@ -38,7 +38,10 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
 {
-    builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    builder.WithOrigins(
+                "http://installers-shtibay.s3-website-eu-west-1.amazonaws.com",
+                "https://shtibay-faults.co.il"
+            ).AllowAnyMethod().AllowAnyHeader();
 }));
 
 
