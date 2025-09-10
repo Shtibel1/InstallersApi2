@@ -50,12 +50,6 @@ namespace DAL.Repositories.Assignments
                 query = query.Where(a => a.Customer.Name.Contains( filters.CustomerName));
             }
 
-            if (filters.skip.HasValue)
-                query = query.Skip(filters.skip.Value);
-
-            if (filters.take.HasValue)
-                query = query.Take(filters.take.Value);
-
             return query;
         }
     }

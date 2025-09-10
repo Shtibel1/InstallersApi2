@@ -61,7 +61,16 @@ namespace DAL.Repositories.Assignments
             }
 
             var assignments = await Task.WhenAll(tasks);
-            return assignments.SelectMany(a => a).ToList();
+            var all = assignments.SelectMany(a => a).ToList();
+
+            // Apply skip/take globally
+            if (filters?.skip.HasValue == true)
+                all = all.Skip(filters.skip.Value).ToList();
+
+            if (filters?.take.HasValue == true)
+                all = all.Take(filters.take.Value).ToList();
+
+            return all;
         }
 
         public async Task<Guid> CreateAssignmentAsync(Assignment assignment)
