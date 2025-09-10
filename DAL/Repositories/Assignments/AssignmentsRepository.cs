@@ -53,10 +53,10 @@ namespace DAL.Repositories.Assignments
                 .Include(a => a.AssignmentAdditionalPrices)
                 .ThenInclude(aap => aap.AdditionalPrice)
                 .ThenInclude(ap => ap.Additional)
-                
+
                 .AsQueryable();
 
-                query = AssignmentsUtils.ApplyFilters(query, filters).Take(500);
+                query = AssignmentsUtils.ApplyFilters(query, filters);
                 tasks.Add(query.ToListAsync());
             }
 
@@ -129,6 +129,8 @@ namespace DAL.Repositories.Assignments
         public Guid? ServiceProviderId { get; set; }
         public bool? IsPaid { get; set; }
         public string? CustomerName { get; set; }
+        public int? skip { get; set; } = 0;
+        public int? take { get; set; } = 5000;
 
 
     }

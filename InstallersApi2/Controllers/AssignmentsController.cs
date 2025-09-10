@@ -33,16 +33,16 @@ namespace InstallersApi2.Controllers
 
         [HttpPost("filter")]
 
-        public async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignmentsByInstaller(filtersVm filters)
+        public async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignmentsByInstaller(AssignmentsFilters filters)
         {
-            if (filters.InstallerId == null)
+            if (filters.ServiceProviderId == null)
             {
                 return BadRequest("Invalid installer ID");
             }
 
             var user = User.FindAll(ClaimTypes.NameIdentifier);
 
-            return await GetAssignmentsInternal(filters.InstallerId, User.FindFirstValue(ClaimTypes.Role), new AssignmentsFilters() { ServiceProviderId = filters.InstallerId});
+            return await GetAssignmentsInternal(filters.ServiceProviderId.Value, User.FindFirstValue(ClaimTypes.Role), filters);
         }
 
         private async Task<ActionResult<IEnumerable<AssignmentVm>>> GetAssignmentsInternal(Guid userId, string role, AssignmentsFilters? filters)
