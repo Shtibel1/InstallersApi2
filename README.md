@@ -1,4 +1,17 @@
-# InstallersApi2 — Multi-Tenant Field-Service & Dispatch Backend (.NET 8)
+<div align="center">
+
+<img src=".github/banner.svg" alt="InstallersApi2" width="100%"/>
+
+![.NET 8](https://img.shields.io/badge/.NET-8-512bd4?logo=dotnet&logoColor=white)
+![EF Core](https://img.shields.io/badge/EF_Core-SQL_Server-6c3fc5)
+![JWT](https://img.shields.io/badge/auth-Identity_%2B_JWT-f59e0b)
+![WebSockets](https://img.shields.io/badge/real--time-WebSockets-34d399)
+[![Client](https://img.shields.io/badge/client-installers_(Angular)-dd0031)](https://github.com/Shtibel1/installers)
+
+**Multi-tenant ASP.NET Core 8 backend for field-service dispatch, stock auditing and contractor settlements.**
+
+</div>
+
 
 ASP.NET Core 8 Web API powering field-service installation workflows, contractor dispatching, equipment stock auditing, and automated contractor settlement calculations. Paired with the [`installers`](https://github.com/Shtibel1/installers) Angular frontend.
 
@@ -11,6 +24,17 @@ InstallersApi2.sln
 ├── InstallersApi2/          # ASP.NET Core 8 Web API (Controllers, JWT Auth, Middlewares, WebSockets)
 ├── BLL/                     # Business Logic Layer (Services, AutoMapper profiles, ViewModels, Validation)
 └── DAL/                     # Data Access Layer (EF Core DbContexts, Repositories, Entities, Query Filters)
+```
+
+```mermaid
+flowchart LR
+  C["installers (Angular)"] -->|JWT · REST| MW["CompanyMiddleware<br/>tenant from claims"]
+  C <-->|WebSocket| WS[WebSocketService]
+  MW --> CT[Controllers]
+  CT --> BLL["BLL services<br/>pricing · stock · calculations"]
+  BLL --> DAL["DAL repositories"]
+  DAL --> CDB[(CentralDbContext)]
+  DAL --> TDB[(CompanyDbContext per tenant)]
 ```
 
 ### Key Engineering Highlights
@@ -45,7 +69,7 @@ InstallersApi2.sln
 - **API Docs**: Swashbuckle / OpenAPI (Swagger UI in Development)
 - **CI/CD**: GitHub Actions (`.github/workflows/deployProd.yml`)
 
-## Local Development
+## Quick start
 
 ### Prerequisites
 - .NET 8 SDK
@@ -73,3 +97,9 @@ InstallersApi2.sln
    dotnet run --project InstallersApi2
    ```
    Swagger UI is available at `https://localhost:<port>/swagger` in development mode.
+
+## Roadmap
+
+- [ ] Integration tests for tenant isolation and settlement calculations
+- [ ] Docker Compose (API + SQL Server) for one-command local setup
+- [ ] Migrate EF Core 7 packages to the .NET 8-aligned versions
