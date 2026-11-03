@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -28,7 +28,9 @@ namespace BLL.Validations
 
             var propertyValue = property.GetValue(validationContext.ObjectInstance)?.ToString();
             if (propertyValue == _desiredValue && value == null)
-                return new ValidationResult($"{validationContext.DisplayName} is required when {_property} is {_desiredValue}.");
+                return new ValidationResult(
+                    $"{validationContext.DisplayName} is required when {_property} is {_desiredValue}.",
+                    validationContext.MemberName is null ? null : new[] { validationContext.MemberName });
 
             return ValidationResult.Success;
         }
