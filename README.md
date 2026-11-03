@@ -2,6 +2,7 @@
 
 <img src=".github/banner.svg" alt="InstallersApi2" width="100%"/>
 
+[![CI](https://github.com/Shtibel1/InstallersApi2/actions/workflows/ci.yml/badge.svg)](https://github.com/Shtibel1/InstallersApi2/actions/workflows/ci.yml)
 ![.NET 8](https://img.shields.io/badge/.NET-8-512bd4?logo=dotnet&logoColor=white)
 ![EF Core](https://img.shields.io/badge/EF_Core-SQL_Server-6c3fc5)
 ![JWT](https://img.shields.io/badge/auth-Identity_%2B_JWT-f59e0b)
@@ -97,6 +98,20 @@ flowchart LR
    dotnet run --project InstallersApi2
    ```
    Swagger UI is available at `https://localhost:<port>/swagger` in development mode.
+
+## Tests
+
+`InstallersApi2.Tests` is an xUnit + Moq suite that runs on every push and PR via GitHub Actions:
+
+| Area | What is covered |
+|---|---|
+| `ConditionalRequiredAttribute` | required-when rules, member-name binding for ModelState, missing-property guard, `SignupModel` service-provider categories |
+| `GlobalExceptionMiddleware` | pass-through, `EntityNotFoundException` → 404 JSON, unhandled → 500 JSON, status-code message resolver |
+| `CalaulationsServics` | contractor settlement creation links every assignment and persists once |
+
+```bash
+dotnet test
+```
 
 ## Roadmap
 
